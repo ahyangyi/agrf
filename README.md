@@ -5,5 +5,12 @@ Ahyangyi's OpenTTD NewGRF Library
 
 This library depends on [grf-py](https://github.com/citymania-org/grf-py), and implements additional high-level functionalities.
 
+Main features:
+* [gorender](https://github.com/mattkimber/gorender) and [cargopositor](https://github.com/mattkimber/cargopositor/) integration.
+* Building (houses, stations, objects) library, modeling the OpenTTD features and abstractions such as symmetry modes on it.
+* NewGRF parameter management, enabling parameter combination search.
+* LayeredImage class to represent an image in the OpenTTD reality.
+* "magic" classes such as MagicSwitch to simplify common transformations on NewGRF data structures.
+
 # License
 This library is licensed in GPLv2+.
