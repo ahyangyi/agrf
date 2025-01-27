@@ -20,7 +20,7 @@ class DefaultGraphics:
     climate_dependent_tiles = {
         (climate, k): load_third_party_image(f"third_party/opengfx2/{climate}/{k}.png")
         for climate in ["temperate", "arctic", "tropical", "toyland"]
-        for k in [1011, 1012, 1037, 1038, 3981, 4550]
+        for k in [1011, 1012, 3981] + ([1037, 1038, 4550] if climate in ["arctic", "tropical"] else [])
     }
     climate_independent_tiles = {
         k: load_third_party_image(f"third_party/opengfx2/{k}.png") for k in [1313, 1314, 1320, 1321, 1322, 1323, 1420]
