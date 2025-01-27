@@ -38,3 +38,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "*" = ["*.*"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*_test.*"]
