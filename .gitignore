@@ -1,0 +1,10 @@
+__pycache__
+*.grf
+*.pyc
+gopath
+/*.vox
+.cache
+render
+*.code-workspace
+*.egg-info
+.directory

@@ -1,0 +1,34 @@
+[project]
+name = "agrf"
+version = "0.0.1"
+authors = [
+    { name="Yi Yang", email="ahyangyi@gmail.com" },
+]
+description = "Ahyangyi's OpenTTD NewGRF Toolkit"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Go",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+  "grf @ git+https://github.com/ahyangyi/grf-py@018cfcf",
+  "tabulate",
+]
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+skip_magic_trailing_comma = true
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".",
+]
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
