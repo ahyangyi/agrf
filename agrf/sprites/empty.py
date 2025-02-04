@@ -42,5 +42,11 @@ class EmptySprite(grf.Sprite):
         return (THIS_FILE,)
 
 
+class EmptyAlternativeSprites(grf.AlternativeSprites):
+    pass
+
+
 def empty_alternatives(w, h, xofs, yofs):
-    return grf.AlternativeSprites(*[EmptySprite(w * k, h * k, xofs * k, yofs * k, v) for k, v in SCALE_TO_ZOOM.items()])
+    return EmptyAlternativeSprites(
+        *[EmptySprite(w * k, h * k, xofs * k, yofs * k, v) for k, v in SCALE_TO_ZOOM.items()]
+    )
