@@ -283,10 +283,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             if isinstance(s, grf.AlternativeSprites):
                 ofs = NewGeneralSprite.estimate_offset(s, scale)
 
-                if isinstance(s, LazyAlternativeSprites):
-                    assert "agrf_manual_crop" in s.voxel.config
-                else:
-                    assert not ofs[2], s
+                assert not ofs[2] or isinstance(s, LazyAlternativeSprites) and "agrf_manual_crop" in s.voxel.config, s
 
                 return ofs[0], ofs[1]
 
