@@ -47,6 +47,11 @@ class BuildingSymmetryMixin:
     def all_variants(self):
         return self.get_all_variants(self)
 
+    def symmetry_fmap(self, f):
+        mapped = list(map(f, self.all_variants))
+        cls = self.__class__.__bases__[0]
+        return cls.create_variants(mapped)
+
     @classmethod
     def is_symmetrical_y(classobj):
         return classobj._symmetry_descriptor[:4] == classobj._symmetry_descriptor[4:]

@@ -16,11 +16,11 @@ temperate_1011_over_1012 = np.array(
 
 
 dgs1012 = ADefaultGroundSprite(1012)
-gs1012 = AGroundSprite(image_sprite("agrf/third_party/opengfx2/temperate/1012.png"))
-ps1012 = AParentSprite(image_sprite("agrf/third_party/opengfx2/temperate/1012.png"), (16, 16, 1), (0, 0, 0))
-ch1011snow = AChildSprite(
-    image_sprite("agrf/third_party/opengfx2/temperate/1011.png"), (0, 0), flags={"dodraw": Registers.SNOW}
-)
+sp1012 = image_sprite("agrf/third_party/opengfx2/temperate/1012.png", crop=False)
+sp1011 = image_sprite("agrf/third_party/opengfx2/temperate/1011.png", child=True)
+gs1012 = AGroundSprite(sp1012)
+ps1012 = AParentSprite(sp1012, (16, 16, 1), (0, 0, 0))
+ch1011snow = AChildSprite(sp1011, (0, 0), flags={"dodraw": Registers.SNOW})
 l1012 = ALayout(dgs1012, [], True)
 l1012snow = ALayout(gs1012 + ch1011snow, [], True)
 pl1012 = ALayout(None, [ps1012], True)
