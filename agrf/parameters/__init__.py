@@ -52,6 +52,14 @@ class Parameter(ParameterReverseLookup):
     def set_index(self, index):
         self.index = index
 
+    @property
+    def code(self):
+        if self.mapping is not None:
+            return f"var(0x7F, param={self.index}, shift=0, and=0xffffffff)"
+
+        m = self.mapping
+        return f"var(0x7F, param={m.grf_parameter}, shift={m.first_bit}, and={2 ** m.num_bit - 1})"
+
 
 class ParameterList:
     def __init__(self, parameters):
@@ -64,13 +72,13 @@ class ParameterList:
             p.add(g, s)
 
     def index(self, name):
-        return [i for i, p in enumerate(self.parameters) if p.name == name][0]
+        return self[name].index
 
     def preset_index(self, name):
         return self.index(name)
 
     def __getitem__(self, name):
-        return self.parameters[self.index(name)]
+        return [p for p in self.parameters if p.name == name][0]
 
     def parameter_by_id(self, i):
         return self.parameters[i]
