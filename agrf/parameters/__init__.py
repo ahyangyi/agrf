@@ -70,7 +70,7 @@ class Parameter(ParameterReverseLookup):
                 condition=0x01,
                 value=self.mapping.first_bit,
                 skip=skip,
-                varsize=4,
+                varsize=1,
             )
         return grf.If(is_static=is_static, variable=self.index, condition=0x02, value=0x0, skip=skip, varsize=4)
 
