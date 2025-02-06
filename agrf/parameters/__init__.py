@@ -54,7 +54,7 @@ class Parameter(ParameterReverseLookup):
 
     @property
     def code(self):
-        if self.mapping is not None:
+        if self.mapping is None:
             return f"var(0x7F, param={self.index}, shift=0, and=0xffffffff)"
 
         m = self.mapping
