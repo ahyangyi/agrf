@@ -8,6 +8,7 @@ from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical,
 from agrf.lib.building.registers import Registers
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM
 from agrf.graphics.spritesheet import LazyAlternativeSprites
+from agrf.graphics.cv.nightmask import make_night_mask
 from agrf.magic import CachedFunctorMixin, TaggedCachedFunctorMixin
 from agrf.utils import unique, unique_tuple
 from agrf.pkg import load_third_party_image
@@ -553,10 +554,10 @@ class ALayout:
             parent_sprites = self.parent_sprites
         else:
             parent_sprites = self.sorted_parent_sprites
-        return grf.SpriteLayout(
-            [s for s in self.ground_sprite.to_grf(sprite_list)]
-            + [s for sprite in parent_sprites for s in sprite.to_grf(sprite_list)]
-        )
+
+        ret = [s for sprite in [self.ground_sprite] + parent_sprites for s in sprite.to_grf(sprite_list)]
+        assert len(ret) < 64
+        return grf.SpriteLayout(ret)
 
     def to_action2(self, feature, sprite_list):
         ground = self.ground_sprite.to_action2(sprite_list)
@@ -622,15 +623,20 @@ class ALayout:
 
 
 class NightSprite(grf.Sprite):
-    def __init__(self, base_sprite, w, h, scale, bpp, xofs=0, yofs=0, darkness=0.75, **kwargs):
-        if "agrf_manual_crop" in base_sprite.voxel.config:
-            dx, dy = base_sprite.voxel.config["agrf_manual_crop"]
-            xofs -= dx * scale
-            yofs -= dy * scale
-        if "agrf_childsprite" in base_sprite.voxel.config:
-            dx, dy = base_sprite.voxel.config["agrf_childsprite"]
-            xofs += dx * scale
-            yofs += dy * scale
+    def __init__(
+        self, base_sprite, w, h, scale, bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
+    ):
+        if automatic_offset_mode == "parent":
+            if "agrf_manual_crop" in base_sprite.voxel.config:
+                dx, dy = base_sprite.voxel.config["agrf_manual_crop"]
+                xofs -= dx * scale
+                yofs -= dy * scale
+            else:
+                assert not base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp).crop
+        elif automatic_offset_mode == "child":
+            s = base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp)
+            xofs += s.xofs
+            yofs += s.yofs
 
         super().__init__(w, h, zoom=SCALE_TO_ZOOM[scale], xofs=xofs, yofs=yofs, **kwargs)
         assert base_sprite is not None and "get_fingerprint" in dir(base_sprite), f"base_sprite {type(base_sprite)}"
@@ -657,10 +663,9 @@ class NightSprite(grf.Sprite):
     def get_data_layers(self, context):
         timer = context.start_timer()
         sprite = self.base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[self.scale], bpp=self.bpp)
-        if sprite is not None:
-            ret = LayeredImage.from_sprite(sprite).copy()
-        from agrf.graphics.cv.nightmask import make_night_mask
+        assert sprite is not None
 
+        ret = LayeredImage.from_sprite(sprite)
         ret = make_night_mask(ret, darkness=self.darkness)
         timer.count_composing()
 
