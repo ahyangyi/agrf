@@ -624,7 +624,7 @@ class ALayout:
 
 class NightSprite(grf.Sprite):
     def __init__(
-        self, base_sprite, w, h, scale, bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
+        self, base_sprite, w, h, scale, base_bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
     ):
         if automatic_offset_mode == "parent":
             if "agrf_manual_crop" in base_sprite.voxel.config:
@@ -632,17 +632,17 @@ class NightSprite(grf.Sprite):
                 xofs -= dx * scale
                 yofs -= dy * scale
             else:
-                assert not base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp).crop
+                assert not base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp).crop
         elif automatic_offset_mode == "child":
-            s = base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp)
+            s = base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp)
             xofs += s.xofs
             yofs += s.yofs
 
-        super().__init__(w, h, zoom=SCALE_TO_ZOOM[scale], xofs=xofs, yofs=yofs, **kwargs)
+        super().__init__(w, h, zoom=SCALE_TO_ZOOM[scale], xofs=xofs, yofs=yofs, bpp=8, crop=True, **kwargs)
         assert base_sprite is not None and "get_fingerprint" in dir(base_sprite), f"base_sprite {type(base_sprite)}"
         self.base_sprite = base_sprite
         self.scale = scale
-        self.bpp = bpp
+        self.base_bpp = base_bpp
         self.darkness = darkness
 
     def get_fingerprint(self):
@@ -651,6 +651,7 @@ class NightSprite(grf.Sprite):
             "w": self.w,
             "h": self.h,
             "bpp": self.bpp,
+            "base_bpp": self.base_bpp,
             "scale": self.scale,
             "xofs": self.xofs,
             "yofs": self.yofs,
@@ -662,7 +663,7 @@ class NightSprite(grf.Sprite):
 
     def get_data_layers(self, context):
         timer = context.start_timer()
-        sprite = self.base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[self.scale], bpp=self.bpp)
+        sprite = self.base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[self.scale], bpp=self.base_bpp)
         assert sprite is not None
 
         ret = LayeredImage.from_sprite(sprite)
