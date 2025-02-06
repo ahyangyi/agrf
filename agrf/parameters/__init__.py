@@ -60,6 +60,20 @@ class Parameter(ParameterReverseLookup):
         m = self.mapping
         return f"var(0x7F, param={m.grf_parameter}, shift={m.first_bit}, and={2 ** m.num_bit - 1})"
 
+    def make_if(self, is_static, skip):
+        assert self.min_value == 0 and self.max_value == 1
+        if self.mapping is not None:
+            assert self.mapping.num_bit == 1
+            return grf.If(
+                is_static=is_static,
+                variable=self.mapping.grf_parameter,
+                condition=0x01,
+                value=self.mapping.first_bit,
+                skip=skip,
+                varsize=4,
+            )
+        return grf.If(is_static=is_static, variable=self.index, condition=0x02, value=0x0, skip=skip, varsize=4)
+
 
 class ParameterList:
     def __init__(self, parameters):
