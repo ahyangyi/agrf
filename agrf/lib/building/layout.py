@@ -627,7 +627,7 @@ class NightSprite(grf.Sprite):
         self, base_sprite, w, h, scale, base_bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
     ):
         if automatic_offset_mode == "parent":
-            if "agrf_manual_crop" in base_sprite.voxel.config:
+            if isinstance(base_sprite, LazyAlternativeSprites) and "agrf_manual_crop" in base_sprite.voxel.config:
                 dx, dy = base_sprite.voxel.config["agrf_manual_crop"]
                 xofs -= dx * scale
                 yofs -= dy * scale
