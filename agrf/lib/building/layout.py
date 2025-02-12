@@ -6,7 +6,7 @@ import functools
 import numpy as np
 from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical, BuildingRotational
 from agrf.lib.building.registers import Registers
-from agrf.graphics import LayeredImage, SCALE_TO_ZOOM
+from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 from agrf.graphics.cv.nightmask import make_night_mask
 from agrf.magic import CachedFunctorMixin, TaggedCachedFunctorMixin
@@ -95,19 +95,45 @@ class NewGraphics(CachedFunctorMixin):
             self.sprite is grf.EMPTY_SPRITE or callable(self.sprite) or isinstance(self.sprite, grf.ResourceAction)
         ), type(self.sprite)
 
+    def best_fit_sprite(self, scale, bpp):
+        if self.sprite is grf.EMPTY_SPRITE:
+            return None
+        best_fit = None
+        for sprite in self.sprite.sprites:
+            fit_score = 0
+            if sprite.bpp != bpp:
+                fit_score -= 1
+            if ZOOM_TO_SCALE[sprite.zoom] < scale:
+                fit_score -= scale // ZOOM_TO_SCALE[sprite.zoom] * 256
+            elif ZOOM_TO_SCALE[sprite.zoom] > scale:
+                fit_score -= ZOOM_TO_SCALE[sprite.zoom] // scale * 2
+            if best_fit is None or fit_score > best_fit_score:
+                best_fit = sprite
+                best_fit_score = fit_score
+
+        assert best_fit is not None
+        return best_fit
+
+    def estimate_offset(self, scale):
+        best_fit = self.best_fit_sprite(scale, 32)
+        at_scale = ZOOM_TO_SCALE[best_fit.zoom]
+        return best_fit.xofs * scale // at_scale, best_fit.yofs * scale // at_scale, best_fit.crop
+
     def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
         if self.sprite is grf.EMPTY_SPRITE:
             return LayeredImage.empty()
-        ret = None
-        sprite = self.sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp)
-        if sprite is not None:
-            ret = LayeredImage.from_sprite(sprite).copy()
 
-        if ret is None and bpp == 32:
-            # Fall back to bpp=8
-            sprite = self.sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=8)
-            ret = LayeredImage.from_sprite(sprite).copy().to_rgb()
-        assert ret is not None
+        best_fit = self.best_fit_sprite(scale, bpp)
+
+        ret = LayeredImage.from_sprite(best_fit).copy()
+        if bpp == 32 and best_fit.bpp == 8:
+            ret = ret.to_rgb()
+        if best_fit.zoom != SCALE_TO_ZOOM[scale]:
+            w, h = ret.w, ret.h
+            new_w, new_h = int(ret.w * scale // ZOOM_TO_SCALE[best_fit.zoom]), int(
+                ret.h * scale // ZOOM_TO_SCALE[best_fit.zoom]
+            )
+            ret.resize(new_w, new_h, force_nearest=True)
 
         return ret
 
@@ -271,18 +297,11 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
         return replace(self, sprite=f(self.sprite), child_sprites=[f(c) for c in self.child_sprites])
 
     @staticmethod
-    def estimate_offset(s, scale):
-        sprite = s.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=32)
-        if sprite is None:
-            sprite = s.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=8)
-        return sprite.xofs, sprite.yofs, sprite.crop
-
-    @staticmethod
     def get_parentsprite_offset(g, scale):
         if isinstance(g, NewGraphics):
             s = g.sprite
             if isinstance(s, grf.AlternativeSprites):
-                ofs = NewGeneralSprite.estimate_offset(s, scale)
+                ofs = g.estimate_offset(scale)
 
                 assert not ofs[2] or isinstance(s, LazyAlternativeSprites) and "agrf_manual_crop" in s.voxel.config, s
 

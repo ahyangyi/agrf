@@ -221,7 +221,7 @@ class LayeredImage:
     # Keep aspect ratio
     # Using given w and h as maximum
     # offsets updated approximately
-    def resize(self, w, h):
+    def resize(self, w, h, force_nearest=False):
         metadata_updated = False
         for k in ["rgb", "alpha", "mask"]:
             img = getattr(self, k)
@@ -229,7 +229,9 @@ class LayeredImage:
                 continue
             old_w, old_h = img.shape[1], img.shape[0]
             img = Image.fromarray(img)
-            img.thumbnail((w, h), Image.Resampling.NEAREST if k == "mask" else Image.Resampling.LANCZOS)
+            img.thumbnail(
+                (w, h), Image.Resampling.NEAREST if k == "mask" or force_nearest else Image.Resampling.LANCZOS
+            )
             img = np.asarray(img)
             setattr(self, k, img)
             new_w, new_h = img.shape[1], img.shape[0]
