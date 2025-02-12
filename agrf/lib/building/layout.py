@@ -381,9 +381,13 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
         return [ps] + [grfobj for child_sprite in self.child_sprites for grfobj in child_sprite.to_grf(sprite_list)]
 
     def to_action2(self, sprite_list):
-        return [{**self.sprite.to_action2_semidict(sprite_list), **self.position.to_action2_semidict(sprite_list)}] + [
-            s for x in self.child_sprites for s in x.to_action2(sprite_list)
-        ]
+        return [
+            {
+                **self.sprite.to_action2_semidict(sprite_list),
+                **self.position.to_action2_semidict(sprite_list),
+                **self.flags_translated,
+            }
+        ] + [s for x in self.child_sprites for s in x.to_action2(sprite_list)]
 
     def get_fingerprint(self):
         return {
