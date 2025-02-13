@@ -16,7 +16,6 @@ classifiers = [
 ]
 dependencies = [
   "grf @ git+https://github.com/ahyangyi/grf-py@018cfcf",
-  "tabulate",
 ]
 
 [tool.black]

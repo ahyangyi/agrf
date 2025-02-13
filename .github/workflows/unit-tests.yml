@@ -32,8 +32,10 @@ jobs:
       - name: Get setuptools
         run: pip install --upgrade setuptools
       - name: Install pytest
-        run: pip install pytest
+        run: pip install pytest coverage
       - name: Install dependencies
         run: pip install .
       - name: Test agrf
-        run: pytest .
+        run: coverage run -m pytest .
+      - name: Generate coverage report
+        run: coverage report -m
