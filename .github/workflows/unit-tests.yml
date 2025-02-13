@@ -36,6 +36,6 @@ jobs:
       - name: Install dependencies
         run: pip install .
       - name: Test agrf
-        run: coverage run -m pytest .
+        run: coverage run -m --source=agrf pytest .
       - name: Generate coverage report
         run: coverage report -m
