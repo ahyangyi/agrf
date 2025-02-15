@@ -5,6 +5,7 @@ from symmetry import (
     BuildingSymmetricalY,
     BuildingRotational,
     BuildingDiagonal,
+    BuildingDiagonalAlt,
     BuildingDiamond,
     BuildingCylindrical,
 )
@@ -91,4 +92,7 @@ def test_join():
 
 
 def test_chirality():
+    assert BuildingFull.chirality_indices() == [0, 2]
+    assert BuildingSymmetrical.chirality_indices() == [0]
     assert BuildingDiagonal.chirality_indices() == [0]
+    assert BuildingDiagonalAlt.chirality_indices() == [0]
