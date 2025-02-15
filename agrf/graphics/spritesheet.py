@@ -11,10 +11,20 @@ THIS_FILE = grf.PythonFile(__file__)
 __image_file_cache = {}
 
 
-def make_image_file(path):
+class VoxelFile(grf.ImageFile):
+    def __init__(self, voxel, path):
+        super().__init__(path)
+        self._voxel = voxel
+
+    def load(self):
+        self._voxel.render()
+        super().load()
+
+
+def make_image_file(voxel, path):
     if path in __image_file_cache:
         return __image_file_cache[path]
-    __image_file_cache[path] = grf.ImageFile(path)
+    __image_file_cache[path] = VoxelFile(voxel, path)
     return __image_file_cache[path]
 
 
@@ -52,10 +62,6 @@ class LazyAlternativeSprites(grf.AlternativeSprites):
         self.voxel = voxel
         self.part = part
         self.kwargs = kwargs or {}
-
-    def get_sprite(self, *, zoom=None, bpp=None):
-        self.voxel.render()
-        return super().get_sprite(zoom=zoom, bpp=bpp)
 
     def get_fingerprint(self):
         return {"name": self.voxel.name, "part": self.part, "prefix": self.voxel.prefix}
@@ -222,7 +228,7 @@ def spritesheet_template(
             *(
                 with_optional_mask(
                     CustomCropFileSprite(
-                        make_image_file(f"{path}_{scale}x_{bpp}bpp.png"),
+                        make_image_file(voxel, f"{path}_{scale}x_{bpp}bpp.png"),
                         (sum(guessed_dimens[j][0] for j in range(i)) + i * 8) * scale,
                         0,
                         guessed_dimens[i][0] * scale,
@@ -247,7 +253,7 @@ def spritesheet_template(
                     ),
                     (
                         CustomCropFileSprite(
-                            make_image_file(f"{path}_{scale}x_mask.png"),
+                            make_image_file(voxel, f"{path}_{scale}x_mask.png"),
                             (sum(guessed_dimens[j][0] for j in range(i)) + i * 8) * scale,
                             0,
                             guessed_dimens[i][0] * scale,
