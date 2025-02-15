@@ -30,6 +30,10 @@ class DefaultGraphics:
         k: load_third_party_image(f"third_party/opengfx2/{k}.png") for k in [1313, 1314, 1320, 1321, 1322, 1323, 1420]
     }
 
+    @staticmethod
+    def register_third_party_image(img_path, climate, sprite_id):
+        DefaultGraphics.climate_dependent_tiles[(climate, sprite_id)] = Image.open(img_path)
+
     def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
         # FIXME handle flags correctly
         if self.sprite_id in self.climate_independent_tiles:
