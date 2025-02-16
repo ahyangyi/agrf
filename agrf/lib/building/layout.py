@@ -4,7 +4,7 @@ import grf
 from PIL import Image
 import functools
 import numpy as np
-from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical, BuildingDiagonal
+from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical, BuildingSymmetricalX, BuildingDiagonal
 from agrf.lib.building.registers import Registers
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
@@ -21,30 +21,36 @@ THIS_FILE = grf.PythonFile(__file__)
 class DefaultGraphics:
     sprite_id: int
 
-    climate_dependent_tiles = {
-        (climate, k): load_third_party_image(f"third_party/opengfx2/{climate}/{k}.png")
-        for climate in ["temperate", "arctic", "tropical", "toyland"]
-        for k in [1011, 1012, 3981] + ([1037, 1038, 4550] if climate in ["arctic", "tropical"] else [])
-    }
-    climate_independent_tiles = {
-        k: load_third_party_image(f"third_party/opengfx2/{k}.png") for k in [1313, 1314, 1320, 1321, 1322, 1323, 1420]
-    }
+    climate_dependent_tiles = {}
+    climate_independent_tiles = {}
 
     @staticmethod
     def register_third_party_image(img_path, climate, sprite_id):
         DefaultGraphics.climate_dependent_tiles[(climate, sprite_id)] = Image.open(img_path)
 
     def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
-        # FIXME handle flags correctly
-        if self.sprite_id in self.climate_independent_tiles:
-            img = np.asarray(self.climate_independent_tiles[self.sprite_id])
-        elif self.sprite_id == 3981:
-            img = np.asarray(self.climate_dependent_tiles[(climate, 4550 if subclimate != "default" else 3981)])
+        if self.sprite_id == 3981 and subclimate != "default":
+            sprite_id_to_load = 4550
+        elif self.sprite_id in [1011, 1012] and subclimate != "default":
+            sprite_id_to_load = self.sprite_id + 26
         else:
-            img = np.asarray(
-                self.climate_dependent_tiles[(climate, self.sprite_id + (26 if subclimate != "default" else 0))]
-            )
-        ret = LayeredImage(-124, 0, 256, 127, img[:, :, :3], img[:, :, 3], None)
+            sprite_id_to_load = self.sprite_id
+
+        if (climate, sprite_id_to_load) in DefaultGraphics.climate_dependent_tiles:
+            img = DefaultGraphics.climate_dependent_tiles[(climate, sprite_id_to_load)]
+        elif climate in DefaultGraphics.climate_independent_tiles:
+            img = DefaultGraphics.climate_independent_tiles[sprite_id_to_load]
+        else:
+            try:
+                img = load_third_party_image(f"third_party/opengfx2/{climate}/{sprite_id_to_load}.png")
+                DefaultGraphics.climate_dependent_tiles[(climate, sprite_id_to_load)] = img
+            except:
+                img = load_third_party_image(f"third_party/opengfx2/{sprite_id_to_load}.png")
+                DefaultGraphics.climate_independent_tiles[sprite_id_to_load] = img
+
+        img = np.asarray(img)
+        h = img.shape[0]
+        ret = LayeredImage(-124, 127 - h, 256, h, img[:, :, :3], img[:, :, 3], None)
         if scale == 4:
             ret = ret.copy()
         elif scale == 2:
@@ -75,9 +81,25 @@ class DefaultGraphics:
 DEFAULT_GRAPHICS = {}
 for x in [1420, 3872, 3981]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x)])
-for x in [1011, 1313]:
+for x in [1011, 1093, 1175, 1313]:
     DEFAULT_GRAPHICS[x] = BuildingSymmetrical.create_variants([DefaultGraphics(x), DefaultGraphics(x + 1)])
     DEFAULT_GRAPHICS[x + 1] = DEFAULT_GRAPHICS[x].M
+
+# FIXME: only some entries are correct
+DEFAULT_GRAPHICS[3992] = BuildingDiagonal.create_variants(
+    [DefaultGraphics(3992), DefaultGraphics(3994), DefaultGraphics(3993), DefaultGraphics(3995)]
+)
+DEFAULT_GRAPHICS[3994] = DEFAULT_GRAPHICS[3992].R
+
+DEFAULT_GRAPHICS[3989] = BuildingDiagonal.create_variants(
+    [DefaultGraphics(3989), DefaultGraphics(3982), DefaultGraphics(3983), DefaultGraphics(3984)]
+)
+DEFAULT_GRAPHICS[3982] = DEFAULT_GRAPHICS[3989].R
+
+DEFAULT_GRAPHICS[3990] = BuildingSymmetricalX.create_variants(
+    [DefaultGraphics(3990), DefaultGraphics(3991), DefaultGraphics(3996), DefaultGraphics(3997)]
+)
+
 for x in [1320]:
     DEFAULT_GRAPHICS[x + 1] = BuildingDiagonal.create_variants(
         [DefaultGraphics(x + 1), DefaultGraphics(x), DefaultGraphics(x + 2), DefaultGraphics(x + 3)]
