@@ -4,7 +4,7 @@ import grf
 from PIL import Image
 import functools
 import numpy as np
-from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical, BuildingRotational
+from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical, BuildingDiagonal
 from agrf.lib.building.registers import Registers
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
@@ -79,7 +79,7 @@ for x in [1011, 1313]:
     DEFAULT_GRAPHICS[x] = BuildingSymmetrical.create_variants([DefaultGraphics(x), DefaultGraphics(x + 1)])
     DEFAULT_GRAPHICS[x + 1] = DEFAULT_GRAPHICS[x].M
 for x in [1320]:
-    DEFAULT_GRAPHICS[x + 1] = BuildingRotational.create_variants(
+    DEFAULT_GRAPHICS[x + 1] = BuildingDiagonal.create_variants(
         [DefaultGraphics(x + 1), DefaultGraphics(x), DefaultGraphics(x + 2), DefaultGraphics(x + 3)]
     )
     DEFAULT_GRAPHICS[x] = DEFAULT_GRAPHICS[x + 1].R
