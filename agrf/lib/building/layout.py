@@ -29,8 +29,8 @@ class DefaultGraphics:
         DefaultGraphics.climate_dependent_tiles[(climate, sprite_id)] = Image.open(img_path)
 
     def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
-        if self.sprite_id == 3981 and subclimate != "default":
-            sprite_id_to_load = 4550
+        if 3981 <= self.sprite_id <= 4012 and subclimate != "default":
+            sprite_id_to_load = self.sprite_id + 569
         elif self.sprite_id in [1011, 1012] and subclimate != "default":
             sprite_id_to_load = self.sprite_id + 26
         else:
