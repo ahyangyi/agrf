@@ -31,8 +31,10 @@ class DefaultGraphics:
     def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
         if 3981 <= self.sprite_id <= 4012 and subclimate != "default":
             sprite_id_to_load = self.sprite_id + 569
-        elif self.sprite_id in [1011, 1012] and subclimate != "default":
+        elif self.sprite_id in [1011, 1012, 1093, 1094, 1175, 1176] and subclimate != "default":
             sprite_id_to_load = self.sprite_id + 26
+        elif self.sprite_id in [1332, 1333] and subclimate != "default":
+            sprite_id_to_load = self.sprite_id + 19
         else:
             sprite_id_to_load = self.sprite_id
 
@@ -81,7 +83,7 @@ class DefaultGraphics:
 DEFAULT_GRAPHICS = {}
 for x in [1420, 3872, 3981]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x)])
-for x in [1011, 1093, 1175, 1313]:
+for x in [1011, 1093, 1175, 1313, 1332]:
     DEFAULT_GRAPHICS[x] = BuildingSymmetrical.create_variants([DefaultGraphics(x), DefaultGraphics(x + 1)])
     DEFAULT_GRAPHICS[x + 1] = DEFAULT_GRAPHICS[x].M
 
