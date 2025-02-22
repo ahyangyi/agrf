@@ -255,12 +255,11 @@ class BBoxPosition:
                 y += 1
         return BBoxPosition(self.extent, (x, y, z))
 
-    def move(self, xofs, yofs):
-        return replace(self, offset=(self.offset[0] + xofs, self.offset[1] + yofs, self.offset[2]))
+    def move(self, xofs, yofs, zofs=0):
+        return replace(self, offset=(self.offset[0] + xofs, self.offset[1] + yofs, self.offset[2] + zofs))
 
     def up(self, zdiff):
-        new_offset = (self.offset[0], self.offset[1], self.offset[2] + zdiff)
-        return replace(self, offset=new_offset)
+        return self.move(0, 0, zofs=zdiff)
 
     def get_fingerprint(self):
         return {"extent": self.extent, "offset": self.offset}
