@@ -500,6 +500,9 @@ def is_in_front(a, b):
         return True
     if ay0 >= by1:
         return True
+    # Special case: we don't sort zero height sprites
+    if az0 == bz0 == az1 == bz1:
+        return False
     if az0 >= bz1:
         return True
     return False
