@@ -210,7 +210,7 @@ class GroundPosition:
 
     def to_parentsprite(self, low=False):
         height = 0 if low else 1
-        return BBoxPosition(extent=(16, 16, height), offset=(0, 0, 0))
+        return BBoxPosition(extent=(16, 16, height), offset=(0, 0, 0), is_ground=True)
 
     def pushdown(self, steps):
         return self.to_parentsprite().pushdown(steps)
@@ -226,16 +226,17 @@ class GroundPosition:
 class BBoxPosition:
     extent: Tuple[int, int, int]
     offset: Tuple[int, int, int]
+    is_ground: bool = False
 
     @property
     def T(self):
         new_offset = (self.offset[0], 16 - self.offset[1] - self.extent[1], self.offset[2])
-        return BBoxPosition(self.extent, new_offset)
+        return replace(self, extent=self.extent, offset=new_offset)
 
     @property
     def R(self):
         new_offset = (16 - self.offset[0] - self.extent[0], self.offset[1], self.offset[2])
-        return BBoxPosition(self.extent, new_offset)
+        return replace(self, extent=self.extent, offset=new_offset)
 
     @staticmethod
     def _mirror(triplet):
@@ -243,7 +244,7 @@ class BBoxPosition:
 
     @property
     def M(self):
-        return BBoxPosition(BBoxPosition._mirror(self.extent), BBoxPosition._mirror(self.offset))
+        return replace(self, extent=BBoxPosition._mirror(self.extent), offset=BBoxPosition._mirror(self.offset))
 
     def pushdown(self, steps):
         x, y, z = self.offset
@@ -253,7 +254,7 @@ class BBoxPosition:
             else:
                 x += 1
                 y += 1
-        return BBoxPosition(self.extent, (x, y, z))
+        return replace(self, extent=self.extent, offset=(x, y, z))
 
     def move(self, xofs, yofs, zofs=0):
         return replace(self, offset=(self.offset[0] + xofs, self.offset[1] + yofs, self.offset[2] + zofs))
@@ -375,7 +376,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def to_parentsprite(self, low=False):
         height = 0 if low else 1
         assert isinstance(self.position, GroundPosition)
-        return replace(self, position=BBoxPosition(extent=(16, 16, height), offset=(0, 0, 0)))
+        return replace(self, position=BBoxPosition(extent=(16, 16, height), offset=(0, 0, 0), is_ground=True))
 
     def pushdown(self, steps):
         return replace(self, position=self.position.pushdown(steps))
@@ -501,8 +502,9 @@ def is_in_front(a, b):
     if ay0 >= by1:
         return True
     # Special case: we don't sort zero height sprites
-    if az0 == bz0 == az1 == bz1:
-        return False
+    if az0 == bz0 == az1 == bz1 and (a.position.is_ground ^ b.position.is_ground):
+        return b.position.is_ground and not a.position.is_ground
+
     if az0 >= bz1:
         return True
     return False
