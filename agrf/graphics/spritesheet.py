@@ -88,6 +88,9 @@ class CustomCropMixin:
         super().__init__(*args, **kw)
         self.fixed_crop = fixed_crop
         self.crop_amount = crop_amount
+        if fixed_crop:
+            assert crop_amount[0] <= self.h
+            assert crop_amount[1] <= self.w
 
     def _do_crop(self, context, w, h, rgb, alpha, mask):
         crop_x = crop_y = 0
@@ -112,6 +115,9 @@ class CustomCropMixin:
 
             w = max(cols_used, default=0) - crop_x + 1
             h = max(rows_used, default=0) - crop_y + 1
+
+            if w <= 0 or h <= 0:
+                w = h = 1
 
             if rgb is not None:
                 rgb = rgb[crop_y : crop_y + h, crop_x : crop_x + w]
