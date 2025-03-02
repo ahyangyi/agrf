@@ -8,13 +8,9 @@ from agrf.lib.building.symmetry import BuildingCylindrical, BuildingSymmetrical,
 from agrf.lib.building.registers import Registers
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
-from agrf.graphics.cv.nightmask import make_night_mask
 from agrf.magic import CachedFunctorMixin, TaggedCachedFunctorMixin
 from agrf.utils import unique, unique_tuple
 from agrf.pkg import load_third_party_image
-
-
-THIS_FILE = grf.PythonFile(__file__)
 
 
 @dataclass
@@ -675,57 +671,6 @@ class ALayout:
 
     def get_resource_files(self):
         return unique_tuple(f for x in [self.ground_sprite] + self.parent_sprites for f in x.get_resource_files())
-
-
-class NightSprite(grf.Sprite):
-    def __init__(
-        self, base_sprite, w, h, scale, base_bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
-    ):
-        if automatic_offset_mode == "parent":
-            if isinstance(base_sprite, LazyAlternativeSprites) and "agrf_manual_crop" in base_sprite.voxel.config:
-                dx, dy = base_sprite.voxel.config["agrf_manual_crop"]
-                xofs -= dx * scale
-                yofs -= dy * scale
-            else:
-                assert not base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp).crop
-        elif automatic_offset_mode == "child":
-            s = base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp)
-            xofs += s.xofs
-            yofs += s.yofs
-
-        super().__init__(w, h, zoom=SCALE_TO_ZOOM[scale], xofs=xofs, yofs=yofs, bpp=8, crop=True, **kwargs)
-        assert base_sprite is not None and "get_fingerprint" in dir(base_sprite), f"base_sprite {type(base_sprite)}"
-        self.base_sprite = base_sprite
-        self.scale = scale
-        self.base_bpp = base_bpp
-        self.darkness = darkness
-
-    def get_fingerprint(self):
-        return {
-            "base_sprite": self.base_sprite.get_fingerprint(),
-            "w": self.w,
-            "h": self.h,
-            "bpp": self.bpp,
-            "base_bpp": self.base_bpp,
-            "scale": self.scale,
-            "xofs": self.xofs,
-            "yofs": self.yofs,
-            "darkness": self.darkness,
-        }
-
-    def get_resource_files(self):
-        return self.base_sprite.get_resource_files() + [THIS_FILE]
-
-    def get_data_layers(self, context):
-        timer = context.start_timer()
-        sprite = self.base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[self.scale], bpp=self.base_bpp)
-        assert sprite is not None
-
-        ret = LayeredImage.from_sprite(sprite)
-        ret = make_night_mask(ret, darkness=self.darkness)
-        timer.count_composing()
-
-        return ret.w, ret.h, ret.rgb, ret.alpha, ret.mask
 
 
 class LayoutSprite(grf.Sprite):
