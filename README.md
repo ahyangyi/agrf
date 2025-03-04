@@ -12,5 +12,8 @@ Main features:
 * LayeredImage class to represent an image in the OpenTTD reality.
 * "magic" classes such as MagicSwitch to simplify common transformations on NewGRF data structures.
 
+# Reverse Dependencies
+`agrf` is currently used by [China Set: Stations - Wuhu](https://github.com/OpenTTD-China-Set/China-Set-Stations-Wuhu/actions) as well as [Ahyangyi's other NewGRFs](https://github.com/ahyangyi/openttd-newgrfs).
+
 # License
 This library is licensed in GPLv2+.
