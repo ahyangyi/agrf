@@ -165,6 +165,7 @@ def spritesheet_template(
     manual_crop=None,
     childsprite=False,
     relative_childsprite=False,
+    nomask=False,
     kwargs=None,
 ):
     guessed_dimens = []
@@ -265,7 +266,7 @@ def spritesheet_template(
                             guessed_dimens[i][0] * scale,
                             guessed_dimens[i][1] * scale,
                         )
-                        if bpp == 32
+                        if bpp == 32 and not nomask
                         else None
                     ),
                 )
