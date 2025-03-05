@@ -22,7 +22,7 @@ class FoundationSprite(grf.Sprite):
         self.foundation_id = foundation_id
 
     def get_fingerprint(self):
-        return {"base_sprite": self.base_sprite.get_fingerprint()}
+        return {"base_sprite": self.base_sprite.get_fingerprint(), "foundation_id": self.foundation_id}
 
     def get_resource_files(self):
         return self.base_sprite.get_resource_files() + (THIS_FILE,)
