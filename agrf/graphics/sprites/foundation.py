@@ -1,5 +1,5 @@
 import grf
-from agrf.graphics.cv.nightmask import make_night_mask
+from agrf.graphics.cv.foundation import make_foundation
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 
@@ -19,17 +19,18 @@ class FoundationSprite(grf.Sprite):
             crop=base_sprite.crop,
         )
         self.base_sprite = base_sprite
+        self.foundation_id = foundation_id
 
     def get_fingerprint(self):
         return {"base_sprite": self.base_sprite.get_fingerprint()}
 
     def get_resource_files(self):
-        return self.base_sprite.get_resource_files() + [THIS_FILE]
+        return self.base_sprite.get_resource_files() + (THIS_FILE,)
 
     def get_data_layers(self, context):
         timer = context.start_timer()
-        sprite = self.base_sprite.get_data_layers(context)
-        ret = LayeredImage.from_sprite(sprite)
+        ret = LayeredImage.from_sprite(self.base_sprite)
+        ret = make_foundation(ret, ZOOM_TO_SCALE[self.base_sprite.zoom], self.foundation_id)
         timer.count_composing()
 
         return ret.w, ret.h, ret.rgb, ret.alpha, ret.mask
