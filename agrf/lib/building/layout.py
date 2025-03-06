@@ -659,6 +659,9 @@ class ALayout:
             new_ground_sprite, new_sprites, self.traversable, self.category, self.notes, altitude=self.altitude
         )
 
+    def __add__(self, parent_sprite):
+        return replace(self, parent_sprites=self.parent_sprites + [parent_sprite])
+
     @property
     def sprites(self):
         return unique(sub for s in [self.ground_sprite] + self.parent_sprites for sub in s.sprites)
