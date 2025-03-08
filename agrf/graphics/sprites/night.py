@@ -9,8 +9,9 @@ THIS_FILE = grf.PythonFile(__file__)
 
 class NightSprite(grf.Sprite):
     def __init__(
-        self, base_sprite, w, h, scale, base_bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
+        self, base_sprite, scale, base_bpp, xofs=0, yofs=0, darkness=0.75, automatic_offset_mode=None, **kwargs
     ):
+        s = base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp)
         if automatic_offset_mode == "parent":
             if isinstance(base_sprite, LazyAlternativeSprites) and "agrf_manual_crop" in base_sprite.voxel.config:
                 dx, dy = base_sprite.voxel.config["agrf_manual_crop"]
@@ -19,11 +20,10 @@ class NightSprite(grf.Sprite):
             else:
                 assert not base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp).crop
         elif automatic_offset_mode == "child":
-            s = base_sprite.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=base_bpp)
             xofs += s.xofs
             yofs += s.yofs
 
-        super().__init__(w, h, zoom=SCALE_TO_ZOOM[scale], xofs=xofs, yofs=yofs, bpp=8, crop=True, **kwargs)
+        super().__init__(s.w, s.h, zoom=SCALE_TO_ZOOM[scale], xofs=xofs, yofs=yofs, bpp=8, crop=True, **kwargs)
         assert base_sprite is not None and "get_fingerprint" in dir(base_sprite), f"base_sprite {type(base_sprite)}"
         self.base_sprite = base_sprite
         self.scale = scale
