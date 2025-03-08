@@ -12,17 +12,17 @@ def make_foundation(img: LayeredImage, scale, part) -> LayeredImage:
         elif part == 1:
             alphamask = (r * 2 - c <= 64 * scale) * (c <= 0) * (r * 2 - c > 47 * scale)
         elif part == 2:
-            alphamask = (r * 2 - c <= 64 * scale) * (c <= 0) * (r * 4 - c * 3 >= 128 * scale)
+            alphamask = (r * 4 - c * 1 <= 96 * scale) * (c <= 0) * (r * 2 - c > 47 * scale)
         elif part == 3:
             alphamask = (r * 4 + c * 3 <= 128 * scale) * (c >= 0) * (r * 2 + c > 47 * scale)
         elif part == 4:
             alphamask = (r * 2 + c <= 64 * scale) * (c >= 0) * (r * 2 + c > 47 * scale)
         elif part == 5:
-            alphamask = (r * 2 + c <= 64 * scale) * (c >= 0) * (r * 4 + c * 3 >= 128 * scale)
+            alphamask = (r * 4 + c * 1 <= 96 * scale) * (c >= 0) * (r * 2 + c > 47 * scale)
         elif part == 6:
-            alphamask = (r * 2 + c >= 64 * scale) * (c <= 0)
+            alphamask = (r * 2 + c <= -16 * scale) * (c <= 0)
         elif part == 7:
-            alphamask = (r * 2 - c >= 64 * scale) * (c >= 0)
+            alphamask = (r * 2 - c <= -16 * scale) * (c >= 0)
         else:
             assert false, f"Unsupported part: {part}"
         alpha = img.alpha * alphamask
