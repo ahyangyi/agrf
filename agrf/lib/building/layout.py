@@ -4,7 +4,13 @@ import grf
 from PIL import Image
 import functools
 import numpy as np
-from .symmetry import BuildingCylindrical, BuildingSymmetrical, BuildingSymmetricalX, BuildingDiagonal
+from .symmetry import (
+    BuildingCylindrical,
+    BuildingSymmetrical,
+    BuildingSymmetricalX,
+    BuildingSymmetricalY,
+    BuildingDiagonal,
+)
 from .registers import Registers
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
@@ -18,6 +24,7 @@ from agrf.pkg import load_third_party_image
 @dataclass
 class DefaultGraphics:
     sprite_id: int
+    yofs: int = 0
 
     climate_dependent_tiles = {}
     climate_independent_tiles = {}
@@ -50,7 +57,7 @@ class DefaultGraphics:
 
         img = np.asarray(img)
         h = img.shape[0]
-        ret = LayeredImage(-124, 127 - h, 256, h, img[:, :, :3], img[:, :, 3], None)
+        ret = LayeredImage(-124, 127 + self.yofs * 4 - h, 256, h, img[:, :, :3], img[:, :, 3], None)
         if scale == 4:
             ret = ret.copy()
         elif scale == 2:
@@ -84,6 +91,13 @@ for x in [1420, 3872, 3981]:
 for x in [1011, 1093, 1175, 1313, 1332]:
     DEFAULT_GRAPHICS[x] = BuildingSymmetrical.create_variants([DefaultGraphics(x), DefaultGraphics(x + 1)])
     DEFAULT_GRAPHICS[x + 1] = DEFAULT_GRAPHICS[x].M
+
+DEFAULT_GRAPHICS[1031] = BuildingSymmetricalY.create_variants(
+    [DefaultGraphics(1031), DefaultGraphics(1034), DefaultGraphics(1033, yofs=-8), DefaultGraphics(1032, yofs=-8)]
+)
+DEFAULT_GRAPHICS[1032] = DEFAULT_GRAPHICS[1031].R.M
+DEFAULT_GRAPHICS[1033] = DEFAULT_GRAPHICS[1031].R
+DEFAULT_GRAPHICS[1034] = DEFAULT_GRAPHICS[1031].M
 
 # FIXME: only some entries are correct
 DEFAULT_GRAPHICS[3992] = BuildingDiagonal.create_variants(
