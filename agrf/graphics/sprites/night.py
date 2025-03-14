@@ -44,7 +44,7 @@ class NightSprite(grf.Sprite):
         }
 
     def get_resource_files(self):
-        return self.base_sprite.get_resource_files() + [THIS_FILE]
+        return tuple(self.base_sprite.get_resource_files()) + (THIS_FILE,)
 
     def get_data_layers(self, context):
         timer = context.start_timer()

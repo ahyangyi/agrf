@@ -308,6 +308,8 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     child_sprites: list = field(default_factory=list)
     flags: dict = field(default_factory=dict)
 
+    extra_storage: dict = None
+
     def __post_init__(self):
         super().__init__()
         if self.child_sprites is None:
@@ -316,6 +318,10 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             self.flags = {}
         if self.is_childsprite():
             assert len(self.child_sprites) == 0
+        if self.extra_storage is None:
+            self.extra_storage = {}
+        else:
+            self.extra_storage = self.extra_storage.copy()
 
     def is_childsprite(self):
         return isinstance(self.position, OffsetPosition)
@@ -572,12 +578,12 @@ class ALayout:
     def pushdown(self, steps):
         from agrf.lib.building.default import empty_ground
 
-        return ALayout(
-            empty_ground,
-            [s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites],
-            self.traversable,
-            category=self.category,
-            notes=self.notes,
+        return replace(
+            self,
+            ground_sprite=empty_ground,
+            parent_sprites=[
+                s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites
+            ],
             flattened=True,
             altitude=self.altitude,
         )
