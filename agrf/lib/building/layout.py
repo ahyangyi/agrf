@@ -308,6 +308,8 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     child_sprites: list = field(default_factory=list)
     flags: dict = field(default_factory=dict)
 
+    extra_sprites: dict = None
+
     def __post_init__(self):
         super().__init__()
         if self.child_sprites is None:
@@ -316,6 +318,10 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             self.flags = {}
         if self.is_childsprite():
             assert len(self.child_sprites) == 0
+        if self.extra_sprites is None:
+            self.extra_sprites = {}
+        else:
+            self.extra_sprites = self.extra_sprites.copy()
 
     def is_childsprite(self):
         return isinstance(self.position, OffsetPosition)
@@ -330,7 +336,11 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def fmap(self, f, method_name):
         if method_name in ["T", "R", "M"]:
             return replace(
-                self, sprite=f(self.sprite), position=f(self.position), child_sprites=[f(c) for c in self.child_sprites]
+                self,
+                sprite=f(self.sprite),
+                position=f(self.position),
+                child_sprites=[f(c) for c in self.child_sprites],
+                extra_sprites={k: f(v) for k, v in self.extra_sprites.items()},
             )
         if method_name in ["move", "demo_translate", "up"]:
             return replace(self, position=f(self.position))
@@ -572,12 +582,12 @@ class ALayout:
     def pushdown(self, steps):
         from agrf.lib.building.default import empty_ground
 
-        return ALayout(
-            empty_ground,
-            [s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites],
-            self.traversable,
-            category=self.category,
-            notes=self.notes,
+        return replace(
+            self,
+            ground_sprite=empty_ground,
+            parent_sprites=[
+                s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites
+            ],
             flattened=True,
             altitude=self.altitude,
         )

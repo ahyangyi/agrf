@@ -247,7 +247,10 @@ class LayeredImage:
         if self.rgb is not None:
             return self
         self.rgb = NUMPY_PALETTE[self.mask]
-        self.alpha = (self.mask != 0).astype(np.uint8) * 255
+        if self.alpha is None:
+            self.alpha = (self.mask != 0).astype(np.uint8) * 255
+        else:
+            self.alpha = (self.mask != 0).astype(np.uint8) * self.alpha
         self.mask = None
 
         return self

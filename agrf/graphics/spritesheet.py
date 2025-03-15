@@ -72,7 +72,7 @@ class LazyAlternativeSprites(grf.AlternativeSprites):
 
     def get_resource_files(self):
         self.voxel.render()
-        return super().get_resource_files()
+        return tuple(super().get_resource_files())
 
     def __repr__(self):
         return f"LazyAlternativeSprites<{self.voxel.name}:{self.part}>"
