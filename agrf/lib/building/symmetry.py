@@ -31,7 +31,7 @@ class BuildingSymmetryMixin:
 
     @classmethod
     def get_all_variants(cls, thing):
-        return [cls.symmetry_index(thing, i) for i in cls.render_indices()]
+        return [cls.symmetry_item(thing, i) for i in cls.render_indices()]
 
     @classmethod
     def get_all_entries(cls, thing):
@@ -166,13 +166,13 @@ class BuildingSymmetryMixin:
 
     @classmethod
     def rotational_views(classobj, cur):
-        return [classobj.symmetry_index(cur, i) for i in classobj.rotational_view_indices()]
+        return [classobj.symmetry_item(cur, i) for i in classobj.rotational_view_indices()]
 
     @classmethod
     def chiralities(classobj, cur):
-        return [classobj.symmetry_index(cur, i) for i in classobj.chirality_indices()]
+        return [classobj.symmetry_item(cur, i) for i in classobj.chirality_indices()]
 
-    def symmetry_index(self, i):
+    def symmetry_item(self, i):
         if i == 0:
             return self
         if i == 1:
@@ -188,6 +188,12 @@ class BuildingSymmetryMixin:
         if i == 6:
             return self.T.R
         return self.T.R.M
+
+    def symmetry_index(self, other):
+        for i in range(8):
+            if self.symmetry_item(i) is other:
+                return i
+        raise KeyError(f"Cannot find {other} as a symmetric view of {self}")
 
     @classmethod
     def canonical_index(classobj, i):

@@ -308,7 +308,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     child_sprites: list = field(default_factory=list)
     flags: dict = field(default_factory=dict)
 
-    extra_storage: dict = None
+    extra_sprites: dict = None
 
     def __post_init__(self):
         super().__init__()
@@ -318,10 +318,10 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             self.flags = {}
         if self.is_childsprite():
             assert len(self.child_sprites) == 0
-        if self.extra_storage is None:
-            self.extra_storage = {}
+        if self.extra_sprites is None:
+            self.extra_sprites = {}
         else:
-            self.extra_storage = self.extra_storage.copy()
+            self.extra_sprites = self.extra_sprites.copy()
 
     def is_childsprite(self):
         return isinstance(self.position, OffsetPosition)
@@ -336,7 +336,11 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def fmap(self, f, method_name):
         if method_name in ["T", "R", "M"]:
             return replace(
-                self, sprite=f(self.sprite), position=f(self.position), child_sprites=[f(c) for c in self.child_sprites]
+                self,
+                sprite=f(self.sprite),
+                position=f(self.position),
+                child_sprites=[f(c) for c in self.child_sprites],
+                extra_sprites={k: f(v) for k, v in self.extra_sprites.items()},
             )
         if method_name in ["move", "demo_translate", "up"]:
             return replace(self, position=f(self.position))

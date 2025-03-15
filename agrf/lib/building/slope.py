@@ -28,6 +28,6 @@ def make_slopes(sprites, sym):
                         slopeType._symmetry_descriptor[slopeType.compose_symmetry_indices(slopeIndex2, i)]
                         == slopeType._symmetry_descriptor[slopeIndex]
                     ):
-                        ret[i][slopeType.value] = sprites[slopeType2.value].symmetry_index(i)
+                        ret[i][slopeType.value] = sprites[slopeType2.value].symmetry_item(i)
                         break
     return ret
