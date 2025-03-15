@@ -130,10 +130,28 @@ class LayeredImage:
 
     def blend_over(self, other):
         if other.rgb is None and other.mask is None:
-            return
+            if other.alpha is not None:
+                if self.rgb is not None:
+                    other2 = other.copy()
+                    other2.rgb = np.zeros((other2.h, other2.w, 3), dtype=np.uint8)
+                    return self.blend_over(other2)
+                if self.mask is not None:
+                    other2 = other.copy()
+                    other2.mask = np.zeros((other2.h, other2.w), dtype=np.uint8)
+                    return self.blend_over(other2)
+                raise NotImplementedError()
+            return self
         if self.rgb is None and self.mask is None:
+            if self.alpha is not None:
+                if other.rgb is not None:
+                    self.rgb = np.zeros((self.h, self.w, 3), dtype=np.uint8)
+                    return self.blend_over(other)
+                if other.mask is not None:
+                    self.mask = np.zeros((self.h, self.w), dtype=np.uint8)
+                    return self.blend_over(other)
+
             self.copy_from(other)
-            return
+            return self
 
         self.adjust_canvas(other)
         x1 = other.xofs - self.xofs
@@ -245,6 +263,10 @@ class LayeredImage:
 
     def to_rgb(self):
         if self.rgb is not None:
+            return self
+
+        if self.mask is None:
+            self.rgb = np.zeros((self.h, self.w, 3), dtype=np.uint8)
             return self
         self.rgb = NUMPY_PALETTE[self.mask]
         if self.alpha is None:
