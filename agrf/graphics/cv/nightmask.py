@@ -10,12 +10,4 @@ def make_night_mask(img: LayeredImage, darkness=0.75) -> LayeredImage:
         a = img.alpha.astype(np.float32) / 255
         mask = ((1 - (1 - darkness) / ((1 - darkness) * (1 - a) + a)) * 255).astype(np.uint8)
 
-    return LayeredImage(
-        xofs=img.xofs,
-        yofs=img.yofs,
-        w=img.w,
-        h=img.h,
-        rgb=None,
-        alpha=mask,
-        mask=np.zeros((img.h, img.w), dtype=np.uint8),
-    )
+    return LayeredImage(xofs=img.xofs, yofs=img.yofs, w=img.w, h=img.h, rgb=None, alpha=mask, mask=None)

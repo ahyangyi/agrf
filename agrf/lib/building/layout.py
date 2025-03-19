@@ -308,6 +308,8 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     child_sprites: list = field(default_factory=list)
     flags: dict = field(default_factory=dict)
 
+    extra_sprites: dict = None
+
     def __post_init__(self):
         super().__init__()
         if self.child_sprites is None:
@@ -316,6 +318,10 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             self.flags = {}
         if self.is_childsprite():
             assert len(self.child_sprites) == 0
+        if self.extra_sprites is None:
+            self.extra_sprites = {}
+        else:
+            self.extra_sprites = self.extra_sprites.copy()
 
     def is_childsprite(self):
         return isinstance(self.position, OffsetPosition)
@@ -330,7 +336,11 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def fmap(self, f, method_name):
         if method_name in ["T", "R", "M"]:
             return replace(
-                self, sprite=f(self.sprite), position=f(self.position), child_sprites=[f(c) for c in self.child_sprites]
+                self,
+                sprite=f(self.sprite),
+                position=f(self.position),
+                child_sprites=[f(c) for c in self.child_sprites],
+                extra_sprites={k: f(v) for k, v in self.extra_sprites.items()},
             )
         if method_name in ["move", "demo_translate", "up"]:
             return replace(self, position=f(self.position))
@@ -531,6 +541,7 @@ class ALayout:
     notes: list = None
     flattened: bool = False
     altitude: int = 0
+    foundation: object = None
 
     def __post_init__(self):
         from agrf.lib.building.default import empty_ground
@@ -572,12 +583,12 @@ class ALayout:
     def pushdown(self, steps):
         from agrf.lib.building.default import empty_ground
 
-        return ALayout(
-            empty_ground,
-            [s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites],
-            self.traversable,
-            category=self.category,
-            notes=self.notes,
+        return replace(
+            self,
+            ground_sprite=empty_ground,
+            parent_sprites=[
+                s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites
+            ],
             flattened=True,
             altitude=self.altitude,
         )
@@ -637,6 +648,11 @@ class ALayout:
             assert False, f"Unsupported slope_type: {slope_type}"
         return replace(self, parent_sprites=self.parent_sprites + [AParentSprite(sp, (16, 16, 0), (0, 0, -8))])
 
+    def enable_foundation(self, slope_type):
+        if self.foundation is not None:
+            return self.add_foundation(self.foundation, slope_type)
+        raise NotImplementedError()
+
     def to_grf(self, sprite_list):
         if self.flattened:
             parent_sprites = self.parent_sprites
@@ -681,19 +697,31 @@ class ALayout:
         return f"<ALayout:{self.ground_sprite}:{self.parent_sprites}>"
 
     def __getattr__(self, name):
-        call = lambda x: getattr(x, name)
+        call = lambda x: getattr(x, name) if x is not None else None
         new_ground_sprite = call(self.ground_sprite)
         new_sprites = [call(sprite) for sprite in self.parent_sprites]
         return ALayout(
-            new_ground_sprite, new_sprites, self.traversable, self.category, self.notes, altitude=self.altitude
+            new_ground_sprite,
+            new_sprites,
+            self.traversable,
+            self.category,
+            self.notes,
+            altitude=self.altitude,
+            foundation=call(self.foundation),
         )
 
     def __call__(self, *args, **kwargs):
-        call = lambda x: x(*args, **kwargs)
+        call = lambda x: x(*args, **kwargs) if x is not None else None
         new_ground_sprite = call(self.ground_sprite)
         new_sprites = [call(sprite) for sprite in self.parent_sprites]
         return ALayout(
-            new_ground_sprite, new_sprites, self.traversable, self.category, self.notes, altitude=self.altitude
+            new_ground_sprite,
+            new_sprites,
+            self.traversable,
+            self.category,
+            self.notes,
+            altitude=self.altitude,
+            foundation=call(self.foundation),
         )
 
     def __add__(self, parent_sprite):

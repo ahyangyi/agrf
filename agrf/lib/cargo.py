@@ -2,9 +2,10 @@ import grf
 
 
 class Cargo(grf.SpriteGenerator):
-    def __init__(self, id, **props):
+    def __init__(self, id, graphics=None, **props):
         self.id = id
         self._props = props
+        self.graphics = graphics
         self.callbacks = grf.make_callback_manager(grf.CARGO, {})
 
     @staticmethod
