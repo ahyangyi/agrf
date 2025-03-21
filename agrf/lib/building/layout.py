@@ -86,6 +86,8 @@ class DefaultGraphics:
 
 
 DEFAULT_GRAPHICS = {}
+for x in [66, 72]:
+    DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=-8)])
 for x in [1420, 3872, 3981]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x)])
 for x in [1011, 1093, 1175, 1313, 1332]:
@@ -648,9 +650,15 @@ class ALayout:
             assert False, f"Unsupported slope_type: {slope_type}"
         return replace(self, parent_sprites=self.parent_sprites + [AParentSprite(sp, (16, 16, 0), (0, 0, -8))])
 
+    def add_default_foundation(self, foundation_id):
+        return replace(
+            self, parent_sprites=self.parent_sprites + [ADefaultParentSprite(foundation_id, (16, 16, 0), (0, 0, -8))]
+        )
+
     def enable_foundation(self, slope_type):
         if self.foundation is not None:
             return self.add_foundation(self.foundation, slope_type)
+
         raise NotImplementedError()
 
     def to_grf(self, sprite_list):
