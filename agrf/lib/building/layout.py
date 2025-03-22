@@ -515,9 +515,9 @@ def is_in_front(a, b):
     ax1, ay1, az1 = (x + y for x, y in zip(a.offset, a.extent))
     bx0, by0, bz0 = b.offset
     bx1, by1, bz1 = (x + y for x, y in zip(b.offset, b.extent))
-    if not overlaps(ax0 - az1, ax1 - az0, bx0 - bz1, bx1 - bz0):
+    if not overlaps(ax0 * 2 - az1, ax1 * 2 - az0, bx0 * 2 - bz1, bx1 * 2 - bz0):
         return False
-    if not overlaps(ay0 - az1, ay1 - az0, by0 - bz1, by1 - bz0):
+    if not overlaps(ay0 * 2 - az1, ay1 * 2 - az0, by0 * 2 - bz1, by1 * 2 - bz0):
         return False
     if not overlaps(ax0 - ay1, ax1 - ay0, bx0 - by1, bx1 - by0):
         return False
