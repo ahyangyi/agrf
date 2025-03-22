@@ -103,7 +103,7 @@ DEFAULT_GRAPHICS[1034] = DEFAULT_GRAPHICS[1031].M
 
 # FIXME: only some entries are correct
 DEFAULT_GRAPHICS[3992] = BuildingDiagonal.create_variants(
-    [DefaultGraphics(3992), DefaultGraphics(3994), DefaultGraphics(3993), DefaultGraphics(3995)]
+    [DefaultGraphics(3992), DefaultGraphics(3994), DefaultGraphics(3996), DefaultGraphics(3995)]
 )
 DEFAULT_GRAPHICS[3994] = DEFAULT_GRAPHICS[3992].R
 
@@ -113,7 +113,7 @@ DEFAULT_GRAPHICS[3989] = BuildingDiagonal.create_variants(
 DEFAULT_GRAPHICS[3982] = DEFAULT_GRAPHICS[3989].R
 
 DEFAULT_GRAPHICS[3990] = BuildingSymmetricalX.create_variants(
-    [DefaultGraphics(3990), DefaultGraphics(3991), DefaultGraphics(3996), DefaultGraphics(3997)]
+    [DefaultGraphics(3990), DefaultGraphics(3993), DefaultGraphics(3987, yofs=-24), DefaultGraphics(3984, yofs=-24)]
 )
 
 for x in [1320]:
