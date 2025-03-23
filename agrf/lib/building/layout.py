@@ -430,6 +430,9 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def registers_to_grf_dict(self):
         return {"flags": sum(grf.SPRITE_FLAGS[k][1] for k in self.flags.keys()), "registers": self.flags_translated}
 
+    def is_empty(self):
+        return isinstance(self.sprite, NewGraphics) and self.sprite.sprite is grf.EMPTY_SPRITE
+
     def to_grf(self, sprite_list):
         if isinstance(self.position, OffsetPosition):
             return [
@@ -558,41 +561,44 @@ class ALayout:
     def sorted_parent_sprites(self):
         if self.flattened:
             return self.parent_sprites
-        for i in self.parent_sprites:
-            for j in self.parent_sprites:
+
+        sprites = [x for x in self.parent_sprites if not x.is_empty()]
+
+        for i in sprites:
+            for j in sprites:
                 if i != j:
                     assert not all(
                         i.offset[k] + i.extent[k] > j.offset[k] and j.offset[k] + j.extent[k] > i.offset[k]
                         for k in range(3)
-                    ), f"{i} and {j} overlap\nSprites: {self.parent_sprites}"
+                    ), f"{i} and {j} overlap\nSprites: {sprites}"
 
         ret = []
-        for i in range(len(self.parent_sprites)):
-            for j in self.parent_sprites:
+        for i in range(len(sprites)):
+            for j in sprites:
                 if j in ret:
                     continue
                 good = True
-                for k in self.parent_sprites:
+                for k in sprites:
                     if k != j and k not in ret and is_in_front(j, k):
                         good = False
                         break
                 if good:
                     ret.append(j)
                     break
-            assert len(ret) == i + 1, f"{self.parent_sprites}, {i}, {ret}"
+            assert len(ret) == i + 1, f"Some sprites cannot be sorted: {[x for x in sprites if x not in ret]}"
+
         return ret
 
-    def pushdown(self, steps):
+    def pushdown(self, steps, flatten=True, low=False):
         from agrf.lib.building.default import empty_ground
 
         return replace(
             self,
             ground_sprite=empty_ground,
             parent_sprites=[
-                s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite()] + self.sorted_parent_sprites
+                s.pushdown(steps) for s in [self.ground_sprite.to_parentsprite(low=low)] + self.sorted_parent_sprites
             ],
-            flattened=True,
-            altitude=self.altitude,
+            flattened=flatten,
         )
 
     @functools.cache
@@ -648,12 +654,14 @@ class ALayout:
             )
         else:
             assert False, f"Unsupported slope_type: {slope_type}"
-        return replace(self, parent_sprites=self.parent_sprites + [AParentSprite(sp, (16, 16, 0), (0, 0, -8))])
+        return replace(
+            self, parent_sprites=self.parent_sprites + [AParentSprite(sp, (16, 16, 0), (0, 0, -8))]
+        ).pushdown(0, low=True, flatten=False)
 
     def add_default_foundation(self, foundation_id):
         return replace(
             self, parent_sprites=self.parent_sprites + [ADefaultParentSprite(foundation_id, (16, 16, 0), (0, 0, -8))]
-        )
+        ).pushdown(0, low=True, flatten=False)
 
     def enable_foundation(self, slope_type):
         if self.foundation is not None:
