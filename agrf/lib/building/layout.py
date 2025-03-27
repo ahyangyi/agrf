@@ -380,6 +380,8 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSNOW and subclimate == "snow":
             return LayeredImage.empty()
+        if self.flags.get("dodraw") == Registers.NOSLOPE:
+            return LayeredImage.empty()
 
         ret = self.sprite.graphics(scale, bpp, climate=climate, subclimate=subclimate)
 
