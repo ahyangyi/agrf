@@ -14,8 +14,6 @@ from .symmetry import (
 from .registers import Registers
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
-from agrf.graphics.helpers.foundation import make_foundations
-from agrf.graphics.helpers.blend import blend_alternative_sprites
 from agrf.magic import CachedFunctorMixin, TaggedCachedFunctorMixin
 from agrf.utils import unique, unique_tuple
 from agrf.pkg import load_third_party_image
@@ -637,25 +635,8 @@ class ALayout:
             altitude=0,
         )
 
-    def add_foundation(self, foundation_sprite, slope_type):
-        if slope_type == 3:
-            sp = make_foundations(foundation_sprite)[5]
-        elif slope_type == 6:
-            sp = make_foundations(foundation_sprite)[2]
-        elif slope_type == 9:
-            sp = blend_alternative_sprites(
-                make_foundations(foundation_sprite)[0], make_foundations(foundation_sprite)[4]
-            )
-        elif slope_type == 12:
-            sp = blend_alternative_sprites(
-                make_foundations(foundation_sprite)[1], make_foundations(foundation_sprite)[3]
-            )
-        elif slope_type == 8:
-            sp = blend_alternative_sprites(
-                make_foundations(foundation_sprite)[1], make_foundations(foundation_sprite)[4]
-            )
-        else:
-            assert False, f"Unsupported slope_type: {slope_type}"
+    def add_foundation(self, foundation_obj, slope_type):
+        sp = foundation_obj.make_sprite(slope_type)
         return replace(
             self, parent_sprites=self.parent_sprites + [AParentSprite(sp, (16, 16, 0), (0, 0, -8))]
         ).pushdown(0, low=True, flatten=False)
