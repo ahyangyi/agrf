@@ -76,7 +76,7 @@ def make_foundation(solid: LayeredImage, ground: LayeredImage, scale, part, cut_
     if solid is not None:
         solid = make_foundation_subimage(solid, scale, part, cut_inside, True)
     if ground is not None:
-        ground = make_foundation_subimage(solid, scale, part, cut_inside, False)
+        ground = make_foundation_subimage(ground, scale, part, cut_inside, False)
     if solid is not None and ground is not None:
-        return ground.blend_over(solid)
+        return ground.copy().blend_over(solid)
     return solid or ground

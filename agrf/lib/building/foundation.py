@@ -1,4 +1,6 @@
 import grf
+import json
+import hashlib
 from dataclasses import dataclass, replace
 from agrf.graphics import SCALE_TO_ZOOM
 from agrf.graphics.sprites.foundation import FoundationSprite
@@ -62,5 +64,18 @@ class Foundation(CachedFunctorMixin):
     def make_foundations(self):
         return self.make_foundations_subset(range(8))
 
-    def convert_foundation_to_ground(sprite):
+    def convert_foundation_to_ground(self):
         return self.make_foundations_subset([8])[0]
+
+    def __hash__(self):
+        return int.from_bytes(
+            hashlib.sha384(json.dumps(self.get_fingerprint(), sort_keys=True).encode()).digest(), byteorder="big"
+        )
+
+    def get_fingerprint(self):
+        return {
+            "solid": self.solid.get_fingerprint() if self.solid is not None else None,
+            "ground": self.ground.get_fingerprint() if self.ground is not None else None,
+            "cut_inside": self.cut_inside,
+            "zshift": self.zshift,
+        }

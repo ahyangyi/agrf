@@ -276,3 +276,6 @@ class LayeredImage:
         self.mask = None
 
         return self
+
+    def __repr__(self):
+        return f"<LayeredImage:{self.w}x{self.h}+{self.xofs}x{self.yofs}>"
