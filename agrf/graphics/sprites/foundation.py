@@ -17,7 +17,7 @@ class FoundationSprite(grf.Sprite):
             xofs=representative.xofs,
             yofs=representative.yofs
             + (8 * ZOOM_TO_SCALE[representative.zoom] if foundation_id == 8 else 0)
-            + zshift * ZOOM_TO_SCALE[representative.zoom],
+            + (zshift * ZOOM_TO_SCALE[representative.zoom]),
             bpp=representative.bpp,
             crop=representative.crop,
         )
@@ -53,6 +53,7 @@ class FoundationSprite(grf.Sprite):
             ZOOM_TO_SCALE[(self.solid_sprite or self.ground_sprite).zoom],
             self.foundation_id,
             self.cut_inside,
+            self.zshift,
         )
         timer.count_composing()
 

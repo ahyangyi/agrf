@@ -3,9 +3,9 @@ import numpy as np
 from .. import LayeredImage
 
 
-def make_foundation_subimage(img: LayeredImage, scale, part, cut_inside, solid) -> LayeredImage:
+def make_foundation_subimage(img: LayeredImage, scale, part, cut_inside, zshift, solid) -> LayeredImage:
     if img.alpha is not None:
-        r = np.arange(img.h)[:, np.newaxis] + img.yofs + 0.5
+        r = np.arange(img.h)[:, np.newaxis] + img.yofs + 0.5 + zshift * scale
         c = np.arange(img.w)[np.newaxis] + img.xofs - scale + 0.5
         if part == 0:
             alphamask = (r * 4 - c * 3 <= 128 * scale) * (c <= 0)
@@ -72,11 +72,11 @@ def make_foundation_subimage(img: LayeredImage, scale, part, cut_inside, solid) 
     return LayeredImage(xofs=img.xofs, yofs=img.yofs, w=img.w, h=img.h, rgb=img.rgb, alpha=alpha, mask=None)
 
 
-def make_foundation(solid: LayeredImage, ground: LayeredImage, scale, part, cut_inside) -> LayeredImage:
+def make_foundation(solid: LayeredImage, ground: LayeredImage, scale, part, cut_inside, zshift) -> LayeredImage:
     if solid is not None:
-        solid = make_foundation_subimage(solid, scale, part, cut_inside, True)
+        solid = make_foundation_subimage(solid, scale, part, cut_inside, zshift, True)
     if ground is not None:
-        ground = make_foundation_subimage(ground, scale, part, cut_inside, False)
+        ground = make_foundation_subimage(ground, scale, part, cut_inside, zshift, False)
     if solid is not None and ground is not None:
         return ground.copy().blend_over(solid)
     return solid or ground
