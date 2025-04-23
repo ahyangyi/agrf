@@ -329,6 +329,9 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def __repr__(self):
         return f"<GeneralSprite:{self.sprite}:{self.position}:{self.child_sprites}:{self.flags}>"
 
+    def copy(self):
+        return replace(self)
+
     @property
     def sprites(self):
         return unique_tuple(self.sprite.sprites + tuple(s for c in self.child_sprites for s in c.sprites))
@@ -547,6 +550,7 @@ class ALayout:
     flattened: bool = False
     altitude: int = 0
     foundation: object = None
+    purchase: object = None
 
     def __post_init__(self):
         from agrf.lib.building.default import empty_ground
@@ -588,6 +592,9 @@ class ALayout:
             assert len(ret) == i + 1, f"Some sprites cannot be sorted: {[x for x in sprites if x not in ret]}"
 
         return ret
+
+    def copy(self):
+        return replace(self)
 
     def pushdown(self, steps, flatten=True, low=False):
         from agrf.lib.building.default import empty_ground
