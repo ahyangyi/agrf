@@ -724,7 +724,9 @@ class ALayout:
         )
 
     def __add__(self, parent_sprite):
-        return replace(self, parent_sprites=self.parent_sprites + [parent_sprite])
+        ret = replace(self, parent_sprites=self.parent_sprites + [parent_sprite])
+        ret.__class__ = ALayout
+        return ret
 
     @property
     def sprites(self):
