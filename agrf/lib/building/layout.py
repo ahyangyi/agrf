@@ -20,6 +20,18 @@ from agrf.pkg import load_third_party_image
 
 
 @dataclass
+class RenderContext:
+    climate: str
+    subclimate: str
+
+    def dodraw(self):
+        return True
+
+
+DEFAULT_RENDER_CONTEXT = RenderContext("temperate", "default")
+
+
+@dataclass
 class DefaultGraphics:
     sprite_id: int
     yofs: int = 0
@@ -31,24 +43,24 @@ class DefaultGraphics:
     def register_third_party_image(img_path, climate, sprite_id):
         DefaultGraphics.climate_dependent_tiles[(climate, sprite_id)] = Image.open(img_path)
 
-    def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
-        if 3981 <= self.sprite_id <= 4012 and subclimate != "default":
+    def graphics(self, scale, bpp, render_context: RenderContext):
+        if 3981 <= self.sprite_id <= 4012 and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 569
-        elif self.sprite_id in [1011, 1012, 1093, 1094, 1175, 1176] and subclimate != "default":
+        elif self.sprite_id in [1011, 1012, 1093, 1094, 1175, 1176] and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 26
-        elif self.sprite_id in [1332, 1333] and subclimate != "default":
+        elif self.sprite_id in [1332, 1333] and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 19
         else:
             sprite_id_to_load = self.sprite_id
 
-        if (climate, sprite_id_to_load) in DefaultGraphics.climate_dependent_tiles:
-            img = DefaultGraphics.climate_dependent_tiles[(climate, sprite_id_to_load)]
-        elif climate in DefaultGraphics.climate_independent_tiles:
+        if (render_context.climate, sprite_id_to_load) in DefaultGraphics.climate_dependent_tiles:
+            img = DefaultGraphics.climate_dependent_tiles[(render_context.climate, sprite_id_to_load)]
+        elif render_context.climate in DefaultGraphics.climate_independent_tiles:
             img = DefaultGraphics.climate_independent_tiles[sprite_id_to_load]
         else:
             try:
-                img = load_third_party_image(f"third_party/opengfx2/{climate}/{sprite_id_to_load}.png")
-                DefaultGraphics.climate_dependent_tiles[(climate, sprite_id_to_load)] = img
+                img = load_third_party_image(f"third_party/opengfx2/{render_context.climate}/{sprite_id_to_load}.png")
+                DefaultGraphics.climate_dependent_tiles[(render_context.climate, sprite_id_to_load)] = img
             except:
                 img = load_third_party_image(f"third_party/opengfx2/{sprite_id_to_load}.png")
                 DefaultGraphics.climate_independent_tiles[sprite_id_to_load] = img
@@ -159,7 +171,7 @@ class NewGraphics(CachedFunctorMixin):
         at_scale = ZOOM_TO_SCALE[best_fit.zoom]
         return best_fit.xofs * scale // at_scale, best_fit.yofs * scale // at_scale, best_fit.crop
 
-    def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
+    def graphics(self, scale, bpp, render_context: RenderContext):
         if self.sprite is grf.EMPTY_SPRITE:
             return LayeredImage.empty()
 
@@ -376,18 +388,20 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         raise NotImplementedError(g)
 
-    def graphics(self, scale, bpp, climate="temperate", subclimate="default"):
-        if self.flags.get("dodraw") == Registers.SNOW and subclimate != "snow":
+    def graphics(self, scale, bpp, render_context: RenderContext):
+        if self.flags.get("dodraw") == Registers.SNOW and render_context.subclimate != "snow":
             return LayeredImage.empty()
-        if self.flags.get("dodraw") == Registers.NOSNOW and subclimate == "snow":
+        if self.flags.get("dodraw") == Registers.NOSNOW and render_context.subclimate == "snow":
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSLOPE:
             return LayeredImage.empty()
+        if "dodraw" in self.flags and not render_context.dodraw(self.flags["dodraw"]):
+            return LayeredImage.empty()
 
-        ret = self.sprite.graphics(scale, bpp, climate=climate, subclimate=subclimate)
+        ret = self.sprite.graphics(scale, bpp, render_context=render_context)
 
         for c in self.child_sprites:
-            masked_sprite = c.graphics(scale, bpp, climate=climate, subclimate=subclimate)
+            masked_sprite = c.graphics(scale, bpp, render_context=render_context)
 
             parentsprite_offset = NewGeneralSprite.get_parentsprite_offset(self.sprite, scale)
             childsprite_offset = NewGeneralSprite.get_childsprite_offset(c.sprite, scale)
@@ -674,15 +688,15 @@ class ALayout:
         buildings = [s for sprite in self.sorted_parent_sprites for s in sprite.to_action2(sprite_list)]
         return grf.AdvancedSpriteLayout(ground=ground[0], feature=feature, buildings=tuple(ground[1:] + buildings))
 
-    def graphics(self, scale, bpp, remap=None, context=None, climate="temperate", subclimate="default"):
+    def graphics(self, scale, bpp, remap=None, context=None, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         context = context or grf.DummyWriteContext()
         img = LayeredImage.empty()
 
-        new_img = self.ground_sprite.graphics(scale, bpp, climate=climate, subclimate=subclimate).copy()
+        new_img = self.ground_sprite.graphics(scale, bpp, render_context=render_context).copy()
         img.blend_over(new_img)
 
         for sprite in self.sorted_parent_sprites:
-            masked_sprite = sprite.graphics(scale, bpp, climate=climate, subclimate=subclimate)
+            masked_sprite = sprite.graphics(scale, bpp, render_context=render_context)
             if remap is not None:
                 masked_sprite.remap(remap)
                 masked_sprite.apply_mask()

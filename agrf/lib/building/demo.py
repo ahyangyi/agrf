@@ -1,7 +1,7 @@
 from dataclasses import dataclass, replace
 from agrf.graphics import LayeredImage
 from agrf.utils import unique_tuple
-from agrf.lib.building.layout import ALayout
+from agrf.lib.building.layout import ALayout, RenderContext
 
 
 @dataclass
@@ -28,7 +28,9 @@ class Demo:
     def graphics(self, scale, bpp, remap=None):
         remap = remap or self.remap
         if self.merge_bbox:
-            return self.to_layout().graphics(scale, bpp, remap, climate=self.climate, subclimate=self.subclimate)
+            return self.to_layout().graphics(
+                scale, bpp, remap, render_context=RenderContext(climate=self.climate, subclimate=self.subclimate)
+            )
         yofs = 32 * scale
         img = LayeredImage.canvas(
             -16 * scale * (len(self.tiles) + len(self.tiles[0])),
@@ -42,7 +44,12 @@ class Demo:
             for c, sprite in enumerate(row[::-1]):
                 if sprite is None:
                     continue
-                subimg = sprite.graphics(scale, bpp, remap=remap, climate=self.climate, subclimate=self.subclimate)
+                subimg = sprite.graphics(
+                    scale,
+                    bpp,
+                    remap=remap,
+                    render_context=RenderContext(climate=self.climate, subclimate=self.subclimate),
+                )
                 img.blend_over(subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c) * scale))
         return img
 
