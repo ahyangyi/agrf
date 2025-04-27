@@ -1,3 +1,4 @@
+from functools import cache
 from dataclasses import dataclass, replace
 from agrf.graphics import LayeredImage
 from agrf.utils import unique_tuple
@@ -12,6 +13,17 @@ class Demo:
     climate: str = "temperate"
     subclimate: str = "default"
     merge_bbox: bool = False
+    render_contexts: list = None
+    _smart_render_contexts: list = None
+
+    def __post_init__(self):
+        if self.render_contexts is None:
+            self._smart_render_contexts = self.infer_render_contexts()
+        else:
+            self._smart_render_contexts = self.render_contexts
+
+    def infer_render_contexts(self):
+        return [[RenderContext(climate=self.climate, subclimate=self.subclimate) for col in row] for row in self.tiles]
 
     def to_layout(self):
         sprites = []
@@ -21,7 +33,9 @@ class Demo:
             for c, sprite in enumerate(row[::-1]):
                 if sprite is not None:
                     sprites.extend(
-                        sprite.demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8).parent_sprites
+                        sprite.demo_filter(self._smart_render_contexts[r][len(row) - 1 - c])
+                        .demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8)
+                        .parent_sprites
                     )
         return ALayout(None, sprites, False)
 
@@ -45,20 +59,19 @@ class Demo:
                 if sprite is None:
                     continue
                 subimg = sprite.graphics(
-                    scale,
-                    bpp,
-                    remap=remap,
-                    render_context=RenderContext(climate=self.climate, subclimate=self.subclimate),
+                    scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
                 )
                 img.blend_over(subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c) * scale))
         return img
 
     @property
     def T(self):
+        assert self.render_contexts is None
         return replace(self, tiles=[[tile and tile.T for tile in row] for row in self.tiles[::-1]])
 
     @property
     def M(self):
+        assert self.render_contexts is None
         return replace(self, tiles=[[tile and tile.M for tile in row[::-1]] for row in list(zip(*self.tiles))[::-1]])
 
     def get_fingerprint(self):

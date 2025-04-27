@@ -19,12 +19,12 @@ from agrf.utils import unique, unique_tuple
 from agrf.pkg import load_third_party_image
 
 
-@dataclass
+@dataclass(frozen=True)
 class RenderContext:
     climate: str
     subclimate: str
 
-    def dodraw(self):
+    def dodraw(self, register):
         return True
 
 
@@ -655,6 +655,10 @@ class ALayout:
             ],
             altitude=0,
         )
+
+    @functools.cache
+    def demo_filter(self, render_context):
+        return self
 
     def add_foundation(self, foundation_obj, slope_type):
         sp = foundation_obj.make_sprite(slope_type)
