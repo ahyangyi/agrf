@@ -3,6 +3,16 @@ from agrf.graphics import SCALE_TO_ZOOM
 from agrf.graphics.sprites.map import MapSprite
 
 
+class MapAlternativeSprites(grf.AlternativeSprites):
+    def __init__(self, name, source, *sprites):
+        super().__init__(*sprites)
+        self.name = name
+        self.source = source
+
+    def get_fingerprint(self):
+        return {"map-name": self.name, "source": self.source.get_fingerprint()}
+
+
 def map_alternative_sprites(a, f, name, xofs=0, yofs=0):
     alts = []
     for scale in [1, 2, 4]:
@@ -14,4 +24,4 @@ def map_alternative_sprites(a, f, name, xofs=0, yofs=0):
             )
             alts.append(fs)
 
-    return grf.AlternativeSprites(*alts)
+    return MapAlternativeSprites(name, a, *alts)
