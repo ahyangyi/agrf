@@ -5,6 +5,9 @@ from agrf.utils import unique_tuple
 from agrf.lib.building.layout import ALayout, RenderContext
 
 
+DEFAULT_RENDER_CONTEXT = RenderContext()
+
+
 @dataclass
 class Demo:
     tiles: list
@@ -12,18 +15,32 @@ class Demo:
     remap: object = None
     climate: str = "temperate"
     subclimate: str = "default"
+    rail_type: str = "default"
     merge_bbox: bool = False
     render_contexts: list = None
     _smart_render_contexts: list = None
 
     def __post_init__(self):
-        if self.render_contexts is None:
-            self._smart_render_contexts = self.infer_render_contexts()
-        else:
-            self._smart_render_contexts = self.render_contexts
+        self._smart_render_contexts = self.infer_render_contexts()
 
     def infer_render_contexts(self):
-        return [[RenderContext(climate=self.climate, subclimate=self.subclimate) for col in row] for row in self.tiles]
+        ret = []
+        for i, row in enumerate(self.tiles):
+            ret_row = []
+            for j, tile in enumerate(row):
+                if self.render_contexts is not None:
+                    rc = self.render_contexts[i][j]
+                else:
+                    rc = DEFAULT_RENDER_CONTEXT
+                ret_row.append(
+                    RenderContext(
+                        climate=rc.climate or self.climate,
+                        subclimate=rc.subclimate or self.subclimate,
+                        rail_type=rc.rail_type or self.rail_type,
+                    )
+                )
+            ret.append(ret_row)
+        return ret
 
     def to_layout(self):
         sprites = []
@@ -43,7 +60,12 @@ class Demo:
         remap = remap or self.remap
         if self.merge_bbox:
             return self.to_layout().graphics(
-                scale, bpp, remap, render_context=RenderContext(climate=self.climate, subclimate=self.subclimate)
+                scale,
+                bpp,
+                remap,
+                render_context=RenderContext(
+                    climate=self.climate, subclimate=self.subclimate, rail_type=self.rail_type
+                ),
             )
         yofs = 32 * scale
         img = LayeredImage.canvas(

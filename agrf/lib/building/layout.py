@@ -21,14 +21,15 @@ from agrf.pkg import load_third_party_image
 
 @dataclass(frozen=True)
 class RenderContext:
-    climate: str
-    subclimate: str
+    climate: str = None
+    subclimate: str = None
+    rail_type: str = None
 
     def dodraw(self, register):
         return True
 
 
-DEFAULT_RENDER_CONTEXT = RenderContext("temperate", "default")
+DEFAULT_RENDER_CONTEXT = RenderContext(climate="temperate", subclimate="default", rail_type="default")
 
 
 @dataclass
@@ -46,12 +47,17 @@ class DefaultGraphics:
     def graphics(self, scale, bpp, render_context: RenderContext):
         if 3981 <= self.sprite_id <= 4012 and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 569
-        elif self.sprite_id in [1011, 1012, 1093, 1094, 1175, 1176] and render_context.subclimate != "default":
+        elif self.sprite_id in [1011, 1012] and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 26
         elif self.sprite_id in [1332, 1333] and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 19
         else:
             sprite_id_to_load = self.sprite_id
+
+        if self.sprite_id in [1011, 1012] and render_context.rail_type == "monorail":
+            sprite_id_to_load += 82
+        elif self.sprite_id in [1011, 1012] and render_context.rail_type == "maglev":
+            sprite_id_to_load += 164
 
         if (render_context.climate, sprite_id_to_load) in DefaultGraphics.climate_dependent_tiles:
             img = DefaultGraphics.climate_dependent_tiles[(render_context.climate, sprite_id_to_load)]
