@@ -15,7 +15,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 dependencies = [
-  "grf @ git+https://github.com/ahyangyi/grf-py@018cfcf",
+  "grf @ git+https://github.com/ahyangyi/grf-py@1c956d6",
 ]
 
 [tool.black]

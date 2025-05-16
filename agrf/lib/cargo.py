@@ -6,6 +6,8 @@ class Cargo(grf.SpriteGenerator):
         self.id = id
         self._props = props
         self.graphics = graphics
+        if self.graphics is not None:
+            self._props["icon_sprite"] = 0xFFFF
         self.callbacks = grf.make_callback_manager(grf.CARGO, {})
 
     @staticmethod
@@ -28,7 +30,14 @@ class Cargo(grf.SpriteGenerator):
         if len(res) == 0:
             return []
         definition = res[-1]
-        self.callbacks.graphics = 0
+        if self.graphics is None:
+            self.callbacks.graphics = 0
+        else:
+            graphics = grf.GenericSpriteLayout(ent1=[0], ent2=[], feature=grf.CARGO)
+            self.callbacks.graphics = graphics
+
+            res.append(grf.Action1(feature=grf.CARGO, set_count=1, sprite_count=1))
+            res.append(self.graphics)
         res.extend(self.callbacks.make_map_action(definition))
 
         return res
