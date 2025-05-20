@@ -161,7 +161,7 @@ def spritesheet_template(
     xdiff=0,
     ydiff=0,
     shift=0,
-    road_mode=False,
+    mode="vehicle",
     manual_crop=None,
     childsprite=False,
     relative_childsprite=False,
@@ -182,15 +182,19 @@ def spritesheet_template(
 
     def get_rels(direction, scale):
         w, h, z_ydiff, z_height = map(lambda a: a * scale, guessed_dimens[direction])
-        if road_mode:
+        if mode == "road":
             xrel = -((w - 1) // (scale * 2) * scale + 1)
+        elif mode == "cargo":
+            xrel = 0
         else:
             # XXX
             # Actually, this is unverified legacy code
             # Vehicle people have much disagreement with what's the right offset anyways...
             xrel = -w / 2
-        if road_mode:
+        if mode == "road":
             yrel = -z_height
+        elif mode == "cargo":
+            yrel = w - h
         else:
             yrel = -h / 2
 
@@ -202,7 +206,7 @@ def spritesheet_template(
             xrel += deltas[direction][0] * oxdiff * scale
             yrel += deltas[direction][1] * oxdiff * scale
 
-        if road_mode and oxspan != 16:
+        if mode == "road" and oxspan != 16:
             offset = 16 - oxspan
             xrel += offsets[direction][0] * offset * scale
             yrel += offsets[direction][1] * offset * scale
@@ -211,7 +215,7 @@ def spritesheet_template(
             xrel += ydeltas[direction][0] * oydiff * scale
             yrel += ydeltas[direction][1] * oydiff * scale
 
-        if road_mode and oyspan != 16:
+        if mode == "road" and oyspan != 16:
             offset = 16 - oyspan
             xrel += yoffsets[direction][0] * offset * scale
             yrel += yoffsets[direction][1] * offset * scale

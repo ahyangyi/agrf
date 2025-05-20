@@ -224,7 +224,15 @@ class LazyVoxel(Config):
 
     @functools.cache
     def spritesheet(self, xdiff=0, ydiff=0, zdiff=0, shift=0, xspan=16, yspan=16):
-        real_xdiff = 0 if self.config.get("agrf_road_mode", False) else 0.5
+        if self.config.get("agrf_road_mode", False):
+            real_xdiff = 0
+            mode = "road"
+        elif self.config.get("agrf_cargo_mode", False):
+            real_xdiff = 0
+            mode = "cargo"
+        else:
+            real_xdiff = 0.5
+            mode = "vehicle"
         real_ydiff = (self.config.get("agrf_zdiff", 0) + zdiff) * self.config.get("agrf_scale", 1)
 
         return spritesheet_template(
@@ -241,7 +249,7 @@ class LazyVoxel(Config):
             bbox_joggle=self.config.get("agrf_bbox_joggle", None),
             xdiff=real_xdiff,
             ydiff=real_ydiff,
-            road_mode=self.config.get("agrf_road_mode", False),
+            mode=mode,
             bpps=self.config["agrf_bpps"],
             scales=self.config["agrf_scales"],
             shift=shift,
