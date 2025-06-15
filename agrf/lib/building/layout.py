@@ -21,15 +21,15 @@ from agrf.pkg import load_third_party_image
 
 @dataclass(frozen=True)
 class RenderContext:
-    climate: str = None
-    subclimate: str = None
-    rail_type: str = None
+    climate: str = "temperate"
+    subclimate: str = "default"
+    rail_type: str = "default"
 
     def dodraw(self, register):
         return True
 
 
-DEFAULT_RENDER_CONTEXT = RenderContext(climate="temperate", subclimate="default", rail_type="default")
+DEFAULT_RENDER_CONTEXT = RenderContext()
 
 
 @dataclass
@@ -44,7 +44,7 @@ class DefaultGraphics:
     def register_third_party_image(img_path, climate, sprite_id):
         DefaultGraphics.climate_dependent_tiles[(climate, sprite_id)] = Image.open(img_path)
 
-    def graphics(self, scale, bpp, render_context: RenderContext):
+    def graphics(self, scale, bpp, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         if 3981 <= self.sprite_id <= 4012 and render_context.subclimate != "default":
             sprite_id_to_load = self.sprite_id + 569
         elif self.sprite_id in [1011, 1012] and render_context.subclimate != "default":
@@ -177,7 +177,7 @@ class NewGraphics(CachedFunctorMixin):
         at_scale = ZOOM_TO_SCALE[best_fit.zoom]
         return best_fit.xofs * scale // at_scale, best_fit.yofs * scale // at_scale, best_fit.crop
 
-    def graphics(self, scale, bpp, render_context: RenderContext):
+    def graphics(self, scale, bpp, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         if self.sprite is grf.EMPTY_SPRITE:
             return LayeredImage.empty()
 
@@ -394,7 +394,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         raise NotImplementedError(g)
 
-    def graphics(self, scale, bpp, render_context: RenderContext):
+    def graphics(self, scale, bpp, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         if self.flags.get("dodraw") == Registers.SNOW and render_context.subclimate != "snow":
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSNOW and render_context.subclimate == "snow":
@@ -663,7 +663,7 @@ class ALayout:
         )
 
     @functools.cache
-    def demo_filter(self, render_context):
+    def demo_filter(self, render_context=DEFAULT_RENDER_CONTEXT):
         return self
 
     def add_foundation(self, foundation_obj, slope_type):
