@@ -21,15 +21,15 @@ from agrf.pkg import load_third_party_image
 
 @dataclass(frozen=True)
 class RenderContext:
-    climate: str = None
-    subclimate: str = None
-    rail_type: str = None
+    climate: str = "temperate"
+    subclimate: str = "default"
+    rail_type: str = "default"
 
     def dodraw(self, register):
         return True
 
 
-DEFAULT_RENDER_CONTEXT = RenderContext(climate="temperate", subclimate="default", rail_type="default")
+DEFAULT_RENDER_CONTEXT = RenderContext()
 
 
 @dataclass
