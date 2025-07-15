@@ -1,0 +1,9 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E203, E731, E741, B019
+per-file-ignores =
+    **/__init__.py:F401, F403
+    road_vehicle/lib/graphics/voxel.py:F401
+    station/*/*.py:F405, F821
+    station/stations/dovemere_2018_lib/layouts.py:F401
+    station/stations/dovemere_2018.py:F403, F405
