@@ -18,7 +18,7 @@ jobs:
       - name: Get setuptools
         run: pip install --upgrade setuptools
       - name: Install pytest
-        run: pip install pytest coverage
+        run: pip install pytest coverage poetry
       - name: Install dependencies
         run: pip install .
       - name: Build
