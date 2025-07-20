@@ -65,10 +65,10 @@ class DefaultGraphics:
             img = DefaultGraphics.climate_independent_tiles[sprite_id_to_load]
         else:
             try:
-                img = load_third_party_image(f"third_party/opengfx2/{render_context.climate}/{sprite_id_to_load}.png")
+                img = load_third_party_image(f"opengfx2/{render_context.climate}/{sprite_id_to_load}.png")
                 DefaultGraphics.climate_dependent_tiles[(render_context.climate, sprite_id_to_load)] = img
             except:
-                img = load_third_party_image(f"third_party/opengfx2/{sprite_id_to_load}.png")
+                img = load_third_party_image(f"opengfx2/{sprite_id_to_load}.png")
                 DefaultGraphics.climate_independent_tiles[sprite_id_to_load] = img
 
         img = np.asarray(img)
