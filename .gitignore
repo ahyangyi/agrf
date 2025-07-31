@@ -7,3 +7,4 @@ __pycache__
 .coverage
 /agrf/gorender/bin
 /agrf/gorender/pkg
+/dist
