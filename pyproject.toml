@@ -37,4 +37,9 @@ packages = [
     { include = "agrf" },
 ]
 exclude = ["*_test.py"]
-include = ["*.json", "*.otf", "*.png"]
+include = [
+    { path = "*.json", format = ["sdist", "wheel"] },
+    { path = "*.otf", format = ["sdist", "wheel"] },
+    { path = "*.png", format = ["sdist", "wheel"] },
+    { path = "agrf/gorender/bin/*", format = ["sdist", "wheel"] },
+]

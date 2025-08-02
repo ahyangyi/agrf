@@ -5,3 +5,6 @@ __pycache__
 *.egg-info
 .directory
 .coverage
+/agrf/gorender/bin
+/agrf/gorender/pkg
+/dist
