@@ -2,7 +2,20 @@ import os
 import subprocess
 import json
 import tempfile
+import pkgutil
 from copy import deepcopy
+
+
+def get_executable_prefix():
+    return os.environ.get(
+        "AGRF_BINARY_PATH", os.path.join(os.path.dirname(pkgutil.get_loader("agrf").get_filename()), "gorender", "bin")
+    )
+
+
+PREFIX = get_executable_prefix()
+GORENDER_PATH = os.path.join(PREFIX, "gorender")
+CARGOPOSITOR_PATH = os.path.join(PREFIX, "positor")
+LAYERFILTER_PATH = os.path.join(PREFIX, "layer-filter")
 
 
 class Config:
@@ -50,7 +63,7 @@ def render(config, vox_path, output_path=None):
     scales = ",".join(map(str, config.config.get("agrf_scales", [1])))
 
     if config is None:
-        subprocess.run(["gorender", "-s", scales, "-p"] + output_clause + [vox_path], check=True)
+        subprocess.run([GORENDER_PATH, "-s", scales, "-p"] + output_clause + [vox_path], check=True)
         return
 
     if config.config.get("agrf_palette"):
@@ -62,7 +75,7 @@ def render(config, vox_path, output_path=None):
         json.dump(config.final_config, f)
         f.flush()
         subprocess.run(
-            ["gorender", "-s", scales, "-m", f.name, "-p"] + palette_clause + output_clause + [vox_path], check=True
+            [GORENDER_PATH, "-s", scales, "-m", f.name, "-p"] + palette_clause + output_clause + [vox_path], check=True
         )
 
 
@@ -91,7 +104,7 @@ def positor(config, vox_path, new_path):
     with tempfile.NamedTemporaryFile("w") as f:
         json.dump(conf, f)
         f.flush()
-        subprocess.run(["positor", "-o", new_path, f.name], check=True)
+        subprocess.run([CARGOPOSITOR_PATH, "-o", new_path, f.name], check=True)
 
 
 def hill_positor_1(vox_path, new_path, degree):
@@ -144,7 +157,7 @@ def discard_layers(discards, vox_path, new_path):
         pass
     os.makedirs(os.path.dirname(new_path), exist_ok=True)
     subprocess.run(
-        ["layer-filter", "--source", vox_path, "--destination", new_path]
+        [LAYERFILTER_PATH, "--source", vox_path, "--destination", new_path]
         + [x for discard in discards for x in ["--discard", discard]],
         check=True,
     )
@@ -158,7 +171,7 @@ def keep_layers(keeps, vox_path, new_path):
         pass
     os.makedirs(os.path.dirname(new_path), exist_ok=True)
     subprocess.run(
-        ["layer-filter", "--source", vox_path, "--destination", new_path]
+        [LAYERFILTER_PATH, "--source", vox_path, "--destination", new_path]
         + [x for keep in keeps for x in ["--keep", keep]],
         check=True,
     )
