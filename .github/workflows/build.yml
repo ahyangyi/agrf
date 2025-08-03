@@ -25,4 +25,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: agrf.whl
-          path: dist/agrf-0.0.1-cp312-cp312-manylinux_2_41_x86_64.whl
+          path: dist/agrf*.whl
