@@ -18,6 +18,20 @@ dependencies = [
   "grf @ git+https://github.com/ahyangyi/grf-py@1c956d6",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "coverage",
+]
+
+lint = [
+    "black",
+]
+
+dev = [
+    "agrf[test,lint]",
+]
+
 [tool.black]
 line-length = 120
 include = '\.pyi?$'
