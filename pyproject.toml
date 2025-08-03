@@ -59,4 +59,4 @@ include = [
 ]
 
 [tool.poetry.build]
-script = "build.py"
+script = "tools/install-deps.py"
