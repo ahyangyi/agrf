@@ -18,6 +18,16 @@ dependencies = [
   "grf @ git+https://github.com/ahyangyi/grf-py@1c956d6",
 ]
 
+[dependency-groups]
+test = [
+    "pytest",
+    "coverage",
+]
+
+dev = [
+    "black",
+]
+
 [tool.black]
 line-length = 120
 include = '\.pyi?$'
