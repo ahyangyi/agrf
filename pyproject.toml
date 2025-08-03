@@ -18,14 +18,18 @@ dependencies = [
   "grf @ git+https://github.com/ahyangyi/grf-py@1c956d6",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 test = [
     "pytest",
     "coverage",
 ]
 
-dev = [
+lint = [
     "black",
+]
+
+dev = [
+    "agrf[test,lint]",
 ]
 
 [tool.black]
