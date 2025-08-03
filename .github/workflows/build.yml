@@ -17,8 +17,8 @@ jobs:
         run: sudo apt update && sudo apt install python3-ply python3-pil libjpeg-dev zlib1g-dev
       - name: Get setuptools
         run: pip install --upgrade setuptools
-      - name: Install pytest
-        run: pip install pytest coverage poetry
+      - name: Install poetry
+        run: pip install poetry
       - name: Install dependencies
         run: pip install .
       - name: Build
