@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
-      - name: Install golang deps
-        run: ./install-go-dependencies.sh
       - name: Install system python deps
         run: sudo apt update && sudo apt install python3-ply python3-pil libjpeg-dev zlib1g-dev
       - name: Get setuptools
@@ -27,4 +25,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: agrf.whl
-          path: dist/agrf-0.0.1-py3-none-any.whl
+          path: dist/agrf*.whl

@@ -57,3 +57,6 @@ include = [
     { path = "*.png", format = ["sdist", "wheel"] },
     { path = "agrf/gorender/bin/*", format = ["sdist", "wheel"] },
 ]
+
+[tool.poetry.build]
+script = "tools/install-deps.py"
