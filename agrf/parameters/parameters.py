@@ -91,6 +91,12 @@ class ParameterList:
     def preset_index(self, name):
         return self.index(name)
 
+    def __contains__(self, name):
+        for p in self.parameters:
+            if p.name == name:
+                return True
+        return False
+
     def __getitem__(self, name):
         return [p for p in self.parameters if p.name == name][0]
 
