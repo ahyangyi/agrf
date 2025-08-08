@@ -14,7 +14,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 dependencies = [
-  "grf @ git+https://github.com/ahyangyi/grf-py@af408d4",
+  "grf @ git+https://github.com/ahyangyi/grf-py@c11c17eb",
 ]
 license = "GPL-2.0-or-later"
 
