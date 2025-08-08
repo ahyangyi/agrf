@@ -436,6 +436,15 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
     def filter_register(self, reg):
         return replace(self, child_sprites=[x for x in self.child_sprites if x.flags.get("dodraw") != reg])
 
+    def replace_register(self, reg1, reg2):
+        if self.flags.get("dodraw") == reg1:
+            new_flags = {**self.flags, "dodraw": reg2}
+        else:
+            new_flags = self.flags
+        return replace(
+            self, child_sprites=[x.replace_register(reg1, reg2) for x in self.child_sprites], flags=new_flags
+        )
+
     @property
     def offset(self):
         assert isinstance(self.position, BBoxPosition)
@@ -646,6 +655,14 @@ class ALayout:
             self,
             ground_sprite=self.ground_sprite.filter_register(reg),
             parent_sprites=[s.filter_register(reg) for s in self.parent_sprites if s.flags.get("dodraw") != reg],
+        )
+
+    @functools.cache
+    def replace_register(self, reg1, reg2):
+        return replace(
+            self,
+            ground_sprite=self.ground_sprite.replace_register(reg1, reg2),
+            parent_sprites=[s.replace_register(reg1, reg2) for s in self.parent_sprites],
         )
 
     @functools.cache
