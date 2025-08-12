@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclass_type_validator import dataclass_type_validator
 
 
 class Length:
@@ -33,3 +34,6 @@ class Size3D:
     length: Length
     width: Length
     height: Length
+
+    def __post_init__(self):
+        dataclass_type_validator(self)

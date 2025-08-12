@@ -1,5 +1,6 @@
 import grf
 from dataclasses import dataclass
+from dataclass_type_validator import dataclass_type_validator
 from typing import Tuple
 
 
@@ -7,6 +8,9 @@ from typing import Tuple
 class SpritePair:
     X: grf.SpriteRef | grf.ResourceAction
     Y: grf.SpriteRef | grf.ResourceAction
+
+    def __post_init__(self):
+        dataclass_type_validator(self)
 
 
 @dataclass
@@ -16,6 +20,9 @@ class SingleTypeBridgeLayout:
     pillars: Tuple[SpritePair, SpritePair, SpritePair, SpritePair, SpritePair, SpritePair]
     flat: Tuple[SpritePair, SpritePair]
     ramp: Tuple[SpritePair, SpritePair]
+
+    def __post_init__(self):
+        dataclass_type_validator(self)
 
     @staticmethod
     def one_grid_layout(back, front, pillars, flat, ramp):
@@ -28,6 +35,9 @@ class BridgeLayout:
     road: SingleTypeBridgeLayout
     mono: SingleTypeBridgeLayout
     mlev: SingleTypeBridgeLayout
+
+    def __post_init__(self):
+        dataclass_type_validator(self)
 
     @staticmethod
     def make_universal(single_layout):

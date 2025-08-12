@@ -1,10 +1,14 @@
 from dataclasses import dataclass
+from dataclass_type_validator import dataclass_type_validator
 from .symmetry import BuildingSymmetricalY, BuildingDiamond, BuildingCylindrical, BuildingDiagonalAlt, BuildingDiagonal
 
 
 @dataclass
 class SlopeType:
     value: int
+
+    def __post_init__(self):
+        dataclass_type_validator(self)
 
 
 slope_types = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 23, 27, 29, 30]

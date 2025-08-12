@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclass_type_validator import dataclass_type_validator
 import grf
 import numpy as np
 from .palette import NUMPY_PALETTE
@@ -13,9 +14,12 @@ class LayeredImage:
     yofs: int
     w: int
     h: int
-    rgb: np.array
-    alpha: np.array
-    mask: np.array
+    rgb: np.ndarray | None
+    alpha: np.ndarray | None
+    mask: np.ndarray | None
+
+    def __post_init__(self):
+        dataclass_type_validator(self)
 
     @staticmethod
     def empty():

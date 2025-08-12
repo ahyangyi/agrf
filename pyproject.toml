@@ -15,6 +15,7 @@ classifiers = [
 ]
 dependencies = [
   "grf @ git+https://github.com/ahyangyi/grf-py@c11c17eb",
+  "dataclass-type-validator>=0.1.2",
 ]
 license = "GPL-2.0-or-later"
 

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, replace, field
-from typing import List, Tuple
+from typing import List, Tuple, Callable
+from dataclass_type_validator import dataclass_type_validator
 import grf
 from PIL import Image
 import functools
@@ -143,15 +144,13 @@ for x in [1320]:
 
 @dataclass
 class NewGraphics(CachedFunctorMixin):
-    sprite: grf.ResourceAction
+    sprite: grf.Sprite | grf.AlternativeSprites | grf.ResourceAction | Callable
     recolour: bool = True
     palette: int = 0
 
     def __post_init__(self):
         super().__init__()
-        assert (
-            self.sprite is grf.EMPTY_SPRITE or callable(self.sprite) or isinstance(self.sprite, grf.ResourceAction)
-        ), type(self.sprite)
+        dataclass_type_validator(self)
 
     def best_fit_sprite(self, scale, bpp):
         if self.sprite is grf.EMPTY_SPRITE:
@@ -340,6 +339,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             self.extra_sprites = {}
         else:
             self.extra_sprites = self.extra_sprites.copy()
+        dataclass_type_validator(self)
 
     def is_childsprite(self):
         return isinstance(self.position, OffsetPosition)

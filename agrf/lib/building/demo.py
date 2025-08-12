@@ -1,5 +1,6 @@
 from functools import cache
 from dataclasses import dataclass, replace
+from dataclass_type_validator import dataclass_type_validator
 from agrf.graphics import LayeredImage
 from agrf.utils import unique_tuple
 from agrf.lib.building.layout import ALayout, RenderContext
@@ -22,6 +23,7 @@ class Demo:
 
     def __post_init__(self):
         self._smart_render_contexts = self.infer_render_contexts()
+        dataclass_type_validator(self)
 
     def infer_render_contexts(self):
         ret = []
