@@ -18,7 +18,7 @@ class Demo:
     subclimate: str = "default"
     rail_type: str = "default"
     merge_bbox: bool = False
-    render_contexts: list = None
+    render_contexts: list | None = None
     _smart_render_contexts: list = None
 
     def __post_init__(self):
