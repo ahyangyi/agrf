@@ -132,7 +132,7 @@ class LayeredImage:
 
         return self
 
-    def blend_over(self, other):
+    def blend_over(self, other, alpha=255):
         if other.rgb is None and other.mask is None:
             if other.alpha is not None:
                 if self.rgb is not None:
@@ -178,13 +178,13 @@ class LayeredImage:
 
             alpha1 = alpha_viewport.astype(np.uint32)
             alpha2 = other.alpha.astype(np.uint32)
-            alpha1_component = np.expand_dims(alpha1 * (255 - alpha2), 2)
-            alpha2_component = np.expand_dims(alpha2 * 255, 2)
+            alpha1_component = np.expand_dims(alpha1 * (65025 - alpha2 * alpha), 2)
+            alpha2_component = np.expand_dims(alpha2 * alpha * 255, 2)
             new_alpha = alpha1_component + alpha2_component
             rgb_viewport[:, :] = (
                 alpha1_component * rgb_viewport + alpha2_component * other.rgb + new_alpha // 2
             ) // np.maximum(new_alpha, 1)
-            alpha_viewport[:, :] = (new_alpha[:, :, 0] + 128) // 255
+            alpha_viewport[:, :] = (new_alpha[:, :, 0] + 32513) // 65025
 
         return self
 
