@@ -133,6 +133,23 @@ class LayeredImage:
         return self
 
     def blend_over(self, other, alpha=255):
+        """
+        Blend another LayeredImage over this one (alpha compositing).
+
+        Note: Despite the name "blend_over", this method performs "other over self"
+        compositing, not "self over other". The method name is potentially confusing.
+
+        Args:
+            other: The LayeredImage to blend over this one
+            alpha: Optional alpha multiplier (0-255) for the overlay
+
+        Returns:
+            self (modified in-place)
+
+        Example:
+            # This blends 'overlay' over 'base' (not the other way around)
+            base.blend_over(overlay)
+        """
         if other.rgb is None and other.mask is None:
             if other.alpha is not None:
                 if self.rgb is not None:
