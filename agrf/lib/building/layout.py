@@ -394,7 +394,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         raise NotImplementedError(g)
 
-    def graphics(self, scale, bpp, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
+    def graphics(self, scale, bpp, remap=None, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         if self.flags.get("dodraw") == Registers.SNOW and render_context.subclimate != "snow":
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSNOW and render_context.subclimate == "snow":
@@ -408,6 +408,9 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         for c in self.child_sprites:
             masked_sprite = c.graphics(scale, bpp, render_context=render_context)
+            if remap is not None:
+                masked_sprite.remap(remap)
+                masked_sprite.apply_mask()
 
             parentsprite_offset = NewGeneralSprite.get_parentsprite_offset(self.sprite, scale)
             childsprite_offset = NewGeneralSprite.get_childsprite_offset(c.sprite, scale)
@@ -706,7 +709,7 @@ class ALayout:
         img.blend_over(new_img)
 
         for sprite in self.sorted_parent_sprites:
-            masked_sprite = sprite.graphics(scale, bpp, render_context=render_context)
+            masked_sprite = sprite.graphics(scale, bpp, remap=remap, render_context=render_context)
             if remap is not None:
                 masked_sprite.remap(remap)
                 masked_sprite.apply_mask()
