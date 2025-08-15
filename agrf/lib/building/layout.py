@@ -81,6 +81,8 @@ class DefaultGraphics:
             ret.resize(128, 63)
         elif scale == 1:
             ret.resize(64, 31)
+        else:
+            ret.resize(int(64 * scale), int(31.75 * scale))
         return ret
 
     def to_spriteref(self, sprite_list):
@@ -394,7 +396,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         raise NotImplementedError(g)
 
-    def graphics(self, scale, bpp, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
+    def graphics(self, scale, bpp, remap=None, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         if self.flags.get("dodraw") == Registers.SNOW and render_context.subclimate != "snow":
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSNOW and render_context.subclimate == "snow":
@@ -408,12 +410,15 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         for c in self.child_sprites:
             masked_sprite = c.graphics(scale, bpp, render_context=render_context)
+            if remap is not None:
+                masked_sprite.remap(remap)
+                masked_sprite.apply_mask()
 
             parentsprite_offset = NewGeneralSprite.get_parentsprite_offset(self.sprite, scale)
             childsprite_offset = NewGeneralSprite.get_childsprite_offset(c.sprite, scale)
 
             masked_sprite.move(
-                parentsprite_offset[0] - childsprite_offset[0], parentsprite_offset[1] - childsprite_offset[1]
+                int(parentsprite_offset[0] - childsprite_offset[0]), int(parentsprite_offset[1] - childsprite_offset[1])
             )
 
             ret.blend_over(masked_sprite)
@@ -706,19 +711,19 @@ class ALayout:
         img.blend_over(new_img)
 
         for sprite in self.sorted_parent_sprites:
-            masked_sprite = sprite.graphics(scale, bpp, render_context=render_context)
+            masked_sprite = sprite.graphics(scale, bpp, remap=remap, render_context=render_context)
             if remap is not None:
                 masked_sprite.remap(remap)
                 masked_sprite.apply_mask()
 
             img.blend_over(
                 masked_sprite.move(
-                    (-sprite.offset[0] * 2 + sprite.offset[1] * 2) * scale,
-                    (sprite.offset[0] + sprite.offset[1] - sprite.offset[2]) * scale,
+                    int((-sprite.offset[0] * 2 + sprite.offset[1] * 2) * scale),
+                    int((sprite.offset[0] + sprite.offset[1] - sprite.offset[2]) * scale),
                 )
             )
 
-        return img.move(0, -self.altitude * 8 * scale)
+        return img.move(0, int(-self.altitude * 8 * scale))
 
     def to_index(self, layout_pool):
         return layout_pool.index(self)
@@ -774,13 +779,14 @@ class ALayout:
 
 
 class LayoutSprite(grf.Sprite):
-    def __init__(self, layout, w, h, scale, bpp, **kwargs):
+    def __init__(self, layout, w, h, scale, layout_scale, bpp, **kwargs):
         super().__init__(w, h, zoom=SCALE_TO_ZOOM[scale], **kwargs)
 
         assert layout is not None
 
         self.layout = layout
         self.scale = scale
+        self.layout_scale = layout_scale
         self.bpp = bpp
 
     def get_fingerprint(self):
@@ -791,6 +797,8 @@ class LayoutSprite(grf.Sprite):
             "bpp": self.bpp,
             "xofs": self.xofs,
             "yofs": self.yofs,
+            "scale": self.scale,
+            "layout_scale": self.layout_scale,
         }
 
     def get_resource_files(self):
@@ -798,8 +806,10 @@ class LayoutSprite(grf.Sprite):
 
     def get_data_layers(self, context):
         timer = context.start_timer()
-        ret = self.layout.graphics(self.scale, self.bpp)
-        ret.resize(self.w, self.h)
+        ret = self.layout.graphics(self.layout_scale, self.bpp)
+        print("RESIZE", ret.w, ret.h, self.w, self.h)
+        # ret.resize(self.w, self.h)
+        # print("    ->", ret.w, ret.h, self.w, self.h)
         timer.count_composing()
 
         self.xofs += ret.xofs

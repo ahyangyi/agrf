@@ -69,12 +69,12 @@ class Demo:
                     climate=self.climate, subclimate=self.subclimate, rail_type=self.rail_type
                 ),
             )
-        yofs = 32 * scale
+        yofs = int(32 * scale)
         img = LayeredImage.canvas(
-            -16 * scale * (len(self.tiles) + len(self.tiles[0])),
+            int(-16 * scale * (len(self.tiles) + len(self.tiles[0]))),
             -yofs,
-            32 * scale * (len(self.tiles) + len(self.tiles[0])),
-            yofs + 16 * scale * (len(self.tiles) + len(self.tiles[0])),
+            int(32 * scale * (len(self.tiles) + len(self.tiles[0]))),
+            int(yofs + 16 * scale * (len(self.tiles) + len(self.tiles[0]))),
             has_mask=remap is None,
         )
 
@@ -85,7 +85,7 @@ class Demo:
                 subimg = sprite.graphics(
                     scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
                 )
-                img.blend_over(subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c) * scale))
+                img.blend_over(subimg.move(int((32 * r - 32 * c) * scale), int((16 * r + 16 * c) * scale)))
         return img
 
     @property
@@ -97,6 +97,9 @@ class Demo:
     def M(self):
         assert self.render_contexts is None
         return replace(self, tiles=[[tile and tile.M for tile in row[::-1]] for row in list(zip(*self.tiles))[::-1]])
+
+    def squash(self, p):
+        return replace(self, tiles=[[c.squash(p) for c in r] for r in self.tiles])
 
     def get_fingerprint(self):
         return {"tiles": [[x and x.get_fingerprint() for x in row] for row in self.tiles], "remap": "FIXME"}  # FIXME

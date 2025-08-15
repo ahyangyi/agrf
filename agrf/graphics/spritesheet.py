@@ -79,7 +79,7 @@ class LazyAlternativeSprites(grf.AlternativeSprites):
 
     @functools.cache
     def squash(self, ratio):
-        squashed_voxel = self.voxel.squash(ratio, "squashed")
+        squashed_voxel = self.voxel.squash(ratio, f"squashed{ratio}")
         return squashed_voxel.spritesheet(**self.kwargs)[self.part]
 
 
@@ -240,16 +240,16 @@ def spritesheet_template(
                 with_optional_mask(
                     CustomCropFileSprite(
                         make_image_file(voxel, f"{path}_{scale}x_{bpp}bpp.png"),
-                        (sum(guessed_dimens[j][0] for j in range(i)) + i * 8) * scale,
+                        int((sum(guessed_dimens[j][0] for j in range(i)) + i * 8) * scale),
                         0,
-                        guessed_dimens[i][0] * scale,
-                        guessed_dimens[i][1] * scale,
-                        xofs=(
+                        int(guessed_dimens[i][0] * scale),
+                        int(guessed_dimens[i][1] * scale),
+                        xofs=int(
                             get_rels(i, scale)[0] - relative_childsprite[0] * scale
                             if relative_childsprite
                             else childsprite[0] * scale if childsprite else get_rels(i, scale)[0]
                         ),
-                        yofs=(
+                        yofs=int(
                             get_rels(i, scale)[1] - relative_childsprite[1] * scale
                             if relative_childsprite
                             else childsprite[1] * scale if childsprite else get_rels(i, scale)[1]
@@ -259,16 +259,19 @@ def spritesheet_template(
                         **(
                             {}
                             if manual_crop is None
-                            else {"fixed_crop": True, "crop_amount": (manual_crop[0] * scale, manual_crop[1] * scale)}
+                            else {
+                                "fixed_crop": True,
+                                "crop_amount": (int(manual_crop[0] * scale), int(manual_crop[1] * scale)),
+                            }
                         ),
                     ),
                     (
                         CustomCropFileSprite(
                             make_image_file(voxel, f"{path}_{scale}x_mask.png"),
-                            (sum(guessed_dimens[j][0] for j in range(i)) + i * 8) * scale,
+                            int((sum(guessed_dimens[j][0] for j in range(i)) + i * 8) * scale),
                             0,
-                            guessed_dimens[i][0] * scale,
-                            guessed_dimens[i][1] * scale,
+                            int(guessed_dimens[i][0] * scale),
+                            int(guessed_dimens[i][1] * scale),
                         )
                         if bpp == 32 and not nomask
                         else None
