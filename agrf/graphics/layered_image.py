@@ -206,6 +206,8 @@ class LayeredImage:
         return self
 
     def move(self, offset_x, offset_y):
+        assert isinstance(offset_x, int)
+        assert isinstance(offset_y, int)
         self.xofs += offset_x
         self.yofs += offset_y
         return self
