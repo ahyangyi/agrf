@@ -101,7 +101,6 @@ class CustomCropMixin:
             timer = context.start_timer()
 
             if self.keep_br_space:
-                print("Keep br space")
                 w = rgb.shape[1] - crop_x
                 h = rgb.shape[0] - crop_y
             else:
@@ -236,7 +235,13 @@ def spritesheet_template(
     def with_optional_mask(sprite, mask):
         if mask is None:
             return sprite
-        return CustomCropWithMask(sprite, mask, fixed_crop=sprite.fixed_crop, crop_amount=sprite.crop_amount)
+        return CustomCropWithMask(
+            sprite,
+            mask,
+            fixed_crop=sprite.fixed_crop,
+            crop_amount=sprite.crop_amount,
+            keep_br_space=sprite.keep_br_space,
+        )
 
     return [
         LazyAlternativeSprites(
