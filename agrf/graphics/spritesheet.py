@@ -84,10 +84,11 @@ class LazyAlternativeSprites(grf.AlternativeSprites):
 
 
 class CustomCropMixin:
-    def __init__(self, *args, fixed_crop=False, crop_amount=(0, 0), **kw):
+    def __init__(self, *args, fixed_crop=False, crop_amount=(0, 0), keep_br_space=False, **kw):
         super().__init__(*args, **kw)
         self.fixed_crop = fixed_crop
         self.crop_amount = crop_amount
+        self.keep_br_space = keep_br_space
         if fixed_crop:
             assert crop_amount[0] <= self.h
             assert crop_amount[1] <= self.w
@@ -98,23 +99,28 @@ class CustomCropMixin:
             crop_x, crop_y = self.crop_amount
 
             timer = context.start_timer()
-            if alpha is not None:
-                cols_bitset = alpha.any(0)
-                rows_bitset = alpha.any(1)
-            elif rgb is not None:
-                cols_bitset = rgb.any((0, 2))
-                rows_bitset = rgb.any((1, 2))
-            elif mask is not None:
-                cols_bitset = mask.any(0)
-                rows_bitset = mask.any(1)
+
+            if self.keep_br_space:
+                print("Keep br space")
+                w = rgb.shape[1] - crop_x
+                h = rgb.shape[0] - crop_y
             else:
-                raise context.failure(self, "All data layers are None")
+                if alpha is not None:
+                    cols_bitset = alpha.any(0)
+                    rows_bitset = alpha.any(1)
+                elif rgb is not None:
+                    cols_bitset = rgb.any((0, 2))
+                    rows_bitset = rgb.any((1, 2))
+                elif mask is not None:
+                    cols_bitset = mask.any(0)
+                    rows_bitset = mask.any(1)
+                else:
+                    raise context.failure(self, "All data layers are None")
+                cols_used = np.arange(w)[cols_bitset]
+                rows_used = np.arange(h)[rows_bitset]
 
-            cols_used = np.arange(w)[cols_bitset]
-            rows_used = np.arange(h)[rows_bitset]
-
-            w = max(cols_used, default=0) - crop_x + 1
-            h = max(rows_used, default=0) - crop_y + 1
+                w = max(cols_used, default=0) - crop_x + 1
+                h = max(rows_used, default=0) - crop_y + 1
 
             if w <= 0 or h <= 0:
                 w = h = 1
@@ -163,6 +169,7 @@ def spritesheet_template(
     shift=0,
     mode="vehicle",
     manual_crop=None,
+    keep_br_space=False,
     childsprite=False,
     relative_childsprite=False,
     nomask=False,
@@ -256,6 +263,7 @@ def spritesheet_template(
                         ),
                         bpp=bpp,
                         zoom=SCALE_TO_ZOOM[scale],
+                        keep_br_space=keep_br_space,
                         **(
                             {}
                             if manual_crop is None

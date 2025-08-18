@@ -254,6 +254,7 @@ class LazyVoxel(Config):
             scales=self.config["agrf_scales"],
             shift=shift,
             manual_crop=self.config.get("agrf_manual_crop", None),
+            keep_br_space=self.config.get("agrf_manual_crop_keep_br_space", False),
             childsprite=self.config.get("agrf_childsprite", False),
             relative_childsprite=self.config.get("agrf_relative_childsprite", False),
             nomask=self.config.get("agrf_no_mask", False),
