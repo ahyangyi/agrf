@@ -11,12 +11,13 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Programming Language :: Go",
-    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     "Operating System :: POSIX :: Linux",
 ]
 dependencies = [
-  "grf @ git+https://github.com/ahyangyi/grf-py@af408d4",
+  "grf @ git+https://github.com/ahyangyi/grf-py@c11c17eb",
+  "dataclass-type-validator>=0.1.2",
 ]
+license = "GPL-2.0-or-later"
 
 [project.optional-dependencies]
 test = [

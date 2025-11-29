@@ -1,5 +1,6 @@
 from dataclasses import dataclass, replace, field
-from typing import List, Tuple
+from typing import List, Tuple, Callable
+from dataclass_type_validator import dataclass_type_validator
 import grf
 from PIL import Image
 import functools
@@ -143,15 +144,13 @@ for x in [1320]:
 
 @dataclass
 class NewGraphics(CachedFunctorMixin):
-    sprite: grf.ResourceAction
+    sprite: grf.Sprite | grf.AlternativeSprites | grf.ResourceAction | Callable
     recolour: bool = True
     palette: int = 0
 
     def __post_init__(self):
         super().__init__()
-        assert (
-            self.sprite is grf.EMPTY_SPRITE or callable(self.sprite) or isinstance(self.sprite, grf.ResourceAction)
-        ), type(self.sprite)
+        dataclass_type_validator(self)
 
     def best_fit_sprite(self, scale, bpp):
         if self.sprite is grf.EMPTY_SPRITE:
@@ -340,6 +339,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             self.extra_sprites = {}
         else:
             self.extra_sprites = self.extra_sprites.copy()
+        dataclass_type_validator(self)
 
     def is_childsprite(self):
         return isinstance(self.position, OffsetPosition)
@@ -394,7 +394,7 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         raise NotImplementedError(g)
 
-    def graphics(self, scale, bpp, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
+    def graphics(self, scale, bpp, remap=None, render_context: RenderContext = DEFAULT_RENDER_CONTEXT):
         if self.flags.get("dodraw") == Registers.SNOW and render_context.subclimate != "snow":
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSNOW and render_context.subclimate == "snow":
@@ -408,6 +408,9 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
 
         for c in self.child_sprites:
             masked_sprite = c.graphics(scale, bpp, render_context=render_context)
+            if remap is not None:
+                masked_sprite.remap(remap)
+                masked_sprite.apply_mask()
 
             parentsprite_offset = NewGeneralSprite.get_parentsprite_offset(self.sprite, scale)
             childsprite_offset = NewGeneralSprite.get_childsprite_offset(c.sprite, scale)
@@ -723,7 +726,7 @@ class ALayout:
         img.blend_over(new_img)
 
         for sprite in self.sorted_parent_sprites:
-            masked_sprite = sprite.graphics(scale, bpp, render_context=render_context)
+            masked_sprite = sprite.graphics(scale, bpp, remap=remap, render_context=render_context)
             if remap is not None:
                 masked_sprite.remap(remap)
                 masked_sprite.apply_mask()

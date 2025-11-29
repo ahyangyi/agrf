@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclass_type_validator import dataclass_type_validator
 import grf
 import numpy as np
 from .palette import NUMPY_PALETTE
@@ -13,9 +14,12 @@ class LayeredImage:
     yofs: int
     w: int
     h: int
-    rgb: np.array
-    alpha: np.array
-    mask: np.array
+    rgb: np.ndarray | None
+    alpha: np.ndarray | None
+    mask: np.ndarray | None
+
+    def __post_init__(self):
+        dataclass_type_validator(self)
 
     @staticmethod
     def empty():
@@ -128,7 +132,24 @@ class LayeredImage:
 
         return self
 
-    def blend_over(self, other):
+    def blend_over(self, other, alpha=255):
+        """
+        Blend another LayeredImage over this one (alpha compositing).
+
+        Note: Despite the name "blend_over", this method performs "other over self"
+        compositing, not "self over other". The method name is potentially confusing.
+
+        Args:
+            other: The LayeredImage to blend over this one
+            alpha: Optional alpha multiplier (0-255) for the overlay
+
+        Returns:
+            self (modified in-place)
+
+        Example:
+            # This blends 'overlay' over 'base' (not the other way around)
+            base.blend_over(overlay)
+        """
         if other.rgb is None and other.mask is None:
             if other.alpha is not None:
                 if self.rgb is not None:
@@ -174,17 +195,19 @@ class LayeredImage:
 
             alpha1 = alpha_viewport.astype(np.uint32)
             alpha2 = other.alpha.astype(np.uint32)
-            alpha1_component = np.expand_dims(alpha1 * (255 - alpha2), 2)
-            alpha2_component = np.expand_dims(alpha2 * 255, 2)
+            alpha1_component = np.expand_dims(alpha1 * (65025 - alpha2 * alpha), 2)
+            alpha2_component = np.expand_dims(alpha2 * alpha * 255, 2)
             new_alpha = alpha1_component + alpha2_component
             rgb_viewport[:, :] = (
                 alpha1_component * rgb_viewport + alpha2_component * other.rgb + new_alpha // 2
             ) // np.maximum(new_alpha, 1)
-            alpha_viewport[:, :] = (new_alpha[:, :, 0] + 128) // 255
+            alpha_viewport[:, :] = (new_alpha[:, :, 0] + 32513) // 65025
 
         return self
 
     def move(self, offset_x, offset_y):
+        assert isinstance(offset_x, int)
+        assert isinstance(offset_y, int)
         self.xofs += offset_x
         self.yofs += offset_y
         return self

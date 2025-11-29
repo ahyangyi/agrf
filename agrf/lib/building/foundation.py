@@ -2,6 +2,7 @@ import grf
 import json
 import hashlib
 from dataclasses import dataclass, replace
+from dataclass_type_validator import dataclass_type_validator
 from agrf.graphics import SCALE_TO_ZOOM
 from agrf.graphics.sprites.foundation import FoundationSprite
 from agrf.graphics.helpers.blend import blend_alternative_sprites
@@ -10,13 +11,14 @@ from agrf.magic import CachedFunctorMixin
 
 @dataclass
 class Foundation(CachedFunctorMixin):
-    solid: grf.AlternativeSprites
-    ground: grf.AlternativeSprites
+    solid: grf.AlternativeSprites | None
+    ground: grf.AlternativeSprites | None
     cut_inside: bool
     zshift: int = 0
 
     def __post_init__(self):
         super().__init__()
+        dataclass_type_validator(self)
 
     def fmap(self, f):
         g = lambda x: f(x) if x is not None else None
