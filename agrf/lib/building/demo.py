@@ -18,6 +18,7 @@ class Demo:
     subclimate: str = "default"
     rail_type: str = "default"
     merge_bbox: bool = False
+    altitude: object = None
     render_contexts: list | None = None
     _smart_render_contexts: list = None
 
@@ -44,6 +45,41 @@ class Demo:
             ret.append(ret_row)
         return ret
 
+    @property
+    def max_altitude(self):
+        if self.altitude is None:
+            return 0
+        return max(
+            self.point_altitude(row, column)
+            for row in range(len(self.tiles) + 1)
+            for column in range(len(self.tiles[0]) + 1)
+        )
+
+    def point_altitude(self, row, column):
+        if self.altitude is None:
+            return 0
+        return self.altitude[row][column]
+
+    def tile_altitude(self, row, column):
+        if self.altitude is None:
+            return 0
+        return min(self.altitude[r][c] for r in [row, row + 1] for c in [column, column + 1])
+
+    def tile_slope(self, row, column):
+        if self.altitude is None:
+            return 0
+        min_altitude = min(self.altitude[r][c] for r in [row, row + 1] for c in [column, column + 1])
+        west = self.altitude[row][column] - min_altitude
+        south = self.altitude[row + 1][column] - min_altitude
+        east = self.altitude[row + 1][column + 1] - min_altitude
+        north = self.altitude[row][column + 1] - min_altitude
+        steep = int(max(west, south, east, north) > 1)
+        west = min(west, 1)
+        south = min(south, 1)
+        east = min(east, 1)
+        north = min(north, 1)
+        return west + south * 2 + east * 4 + north * 8 + steep * 16
+
     def to_layout(self):
         sprites = []
         rows = len(self.tiles)
@@ -51,14 +87,17 @@ class Demo:
         for r, row in enumerate(self.tiles):
             for c, sprite in enumerate(row[::-1]):
                 if sprite is not None:
+                    tile_slope = self.tile_slope(r, c)
+                    sprite = sprite.enable_foundation(tile_slope)
                     sprites.extend(
                         sprite.demo_filter(self._smart_render_contexts[r][len(row) - 1 - c])
-                        .demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8)
+                        .demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8, self.tile_altitude(r, c))
                         .parent_sprites
                     )
         return ALayout(None, sprites, False)
 
     def graphics(self, scale, bpp, remap=None):
+        max_altitude = self.max_altitude
         remap = remap or self.remap
         if self.merge_bbox:
             return self.to_layout().graphics(
@@ -85,7 +124,9 @@ class Demo:
                 subimg = sprite.graphics(
                     scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
                 )
-                img.blend_over(subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c) * scale))
+                img.blend_over(
+                    subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c - 8 * self.tile_altitude(r, c)) * scale)
+                )
         return img
 
     @property

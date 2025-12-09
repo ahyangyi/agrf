@@ -1,5 +1,5 @@
 from dataclasses import dataclass, replace, field
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Optional
 from dataclass_type_validator import dataclass_type_validator
 import grf
 from PIL import Image
@@ -574,6 +574,7 @@ class ALayout:
     altitude: int = 0
     foundation: object = None
     purchase: object = None
+    slope_variants: Optional[dict] = None
 
     def __post_init__(self):
         from agrf.lib.building.default import empty_ground
@@ -652,14 +653,14 @@ class ALayout:
         )
 
     @functools.cache
-    def demo_translate(self, xofs, yofs):
+    def demo_translate(self, xofs, yofs, zofs):
         from agrf.lib.building.default import empty_ground
 
         return replace(
             self,
             ground_sprite=empty_ground,
             parent_sprites=[
-                s.demo_translate(xofs, yofs, self.altitude)
+                s.demo_translate(xofs, yofs, self.altitude + zofs)
                 for s in [self.ground_sprite.to_parentsprite(low=True)] + self.sorted_parent_sprites
             ],
             altitude=0,
@@ -681,8 +682,14 @@ class ALayout:
         ).pushdown(0, low=True, flatten=False)
 
     def enable_foundation(self, slope_type):
+        if self.slope_variants is not None:
+            return self.slope_variants[slope_type]
+
+        if slope_type == 0:
+            return self
+
         if self.foundation is not None:
-            return self.add_foundation(self.foundation, slope_type)
+            return self.add_foundation(self.foundation, slope_type).raise_tile(1)
 
         raise NotImplementedError()
 
