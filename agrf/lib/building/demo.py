@@ -97,37 +97,43 @@ class Demo:
         return ALayout(None, sprites, False)
 
     def graphics(self, scale, bpp, remap=None):
-        max_altitude = self.max_altitude
-        remap = remap or self.remap
-        if self.merge_bbox:
-            return self.to_layout().graphics(
-                scale,
-                bpp,
-                remap,
-                render_context=RenderContext(
-                    climate=self.climate, subclimate=self.subclimate, rail_type=self.rail_type
-                ),
+        try:
+            max_altitude = self.max_altitude
+            remap = remap or self.remap
+            if self.merge_bbox:
+                return self.to_layout().graphics(
+                    scale,
+                    bpp,
+                    remap,
+                    render_context=RenderContext(
+                        climate=self.climate, subclimate=self.subclimate, rail_type=self.rail_type
+                    ),
+                )
+            yofs = 32 * scale
+            img = LayeredImage.canvas(
+                -16 * scale * (len(self.tiles) + len(self.tiles[0])),
+                -yofs,
+                32 * scale * (len(self.tiles) + len(self.tiles[0])),
+                yofs + 16 * scale * (len(self.tiles) + len(self.tiles[0])),
+                has_mask=remap is None,
             )
-        yofs = 32 * scale
-        img = LayeredImage.canvas(
-            -16 * scale * (len(self.tiles) + len(self.tiles[0])),
-            -yofs,
-            32 * scale * (len(self.tiles) + len(self.tiles[0])),
-            yofs + 16 * scale * (len(self.tiles) + len(self.tiles[0])),
-            has_mask=remap is None,
-        )
 
-        for r, row in enumerate(self.tiles):
-            for c, sprite in enumerate(row[::-1]):
-                if sprite is None:
-                    continue
-                subimg = sprite.graphics(
-                    scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
-                )
-                img.blend_over(
-                    subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c - 8 * self.tile_altitude(r, c)) * scale)
-                )
-        return img
+            for r, row in enumerate(self.tiles):
+                for c, sprite in enumerate(row[::-1]):
+                    if sprite is None:
+                        continue
+                    subimg = sprite.graphics(
+                        scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
+                    )
+                    img.blend_over(
+                        subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c - 8 * self.tile_altitude(r, c)) * scale)
+                    )
+            return img
+        except Exception as e:
+            # Error message is generally particularly hard to understand when something goes wrong here
+            # Hence, we always print the demo title when an exception happens
+            print(f"Caught exception during demo graphics generation: {self.title}")
+            raise
 
     @property
     def T(self):
