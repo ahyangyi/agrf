@@ -20,11 +20,13 @@ mono = BuildingDiagonalAlt.create_variants([SlopeType(1), SlopeType(4), SlopeTyp
 tri = BuildingDiagonal.create_variants([SlopeType(7), SlopeType(14), SlopeType(11), SlopeType(13)])
 steep = BuildingDiagonal.create_variants([SlopeType(23), SlopeType(30), SlopeType(27), SlopeType(29)])
 
+slope_groups = [flat, ortho, para, mono, tri, steep]
+
 
 def make_slopes(sprites, sym):
     ret = {i: {} for i in sym.render_indices()}
 
-    for slopeGroup in [flat, ortho, para, mono, tri, steep]:
+    for slopeGroup in slope_groups:
         for slopeIndex, slopeType in zip(slopeGroup.render_indices(), slopeGroup.all_variants):
             for i in sym.render_indices():
                 for slopeIndex2, slopeType2 in zip(slopeGroup.render_indices(), slopeGroup.all_variants):

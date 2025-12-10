@@ -13,6 +13,7 @@ from .symmetry import (
     BuildingDiagonal,
 )
 from .registers import Registers
+from .slope import slope_groups
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 from agrf.magic import CachedFunctorMixin, TaggedCachedFunctorMixin
@@ -118,20 +119,10 @@ DEFAULT_GRAPHICS[1032] = DEFAULT_GRAPHICS[1031].R.M
 DEFAULT_GRAPHICS[1033] = DEFAULT_GRAPHICS[1031].R
 DEFAULT_GRAPHICS[1034] = DEFAULT_GRAPHICS[1031].M
 
-# FIXME: only some entries are correct
-DEFAULT_GRAPHICS[3992] = BuildingDiagonal.create_variants(
-    [DefaultGraphics(3992), DefaultGraphics(3994), DefaultGraphics(3996), DefaultGraphics(3995)]
-)
-DEFAULT_GRAPHICS[3994] = DEFAULT_GRAPHICS[3992].R
-
-DEFAULT_GRAPHICS[3989] = BuildingDiagonal.create_variants(
-    [DefaultGraphics(3989), DefaultGraphics(3982), DefaultGraphics(3983), DefaultGraphics(3984)]
-)
-DEFAULT_GRAPHICS[3982] = DEFAULT_GRAPHICS[3989].R
-
-DEFAULT_GRAPHICS[3990] = BuildingSymmetricalX.create_variants(
-    [DefaultGraphics(3990), DefaultGraphics(3993), DefaultGraphics(3987, yofs=-24), DefaultGraphics(3984, yofs=-24)]
-)
+for slope_group in slope_groups:
+    var = slope_group.symmetry.create_variants([DefaultGraphics(3981 + v.value) for v in slope_group.all_variants])
+    for slope_index in slope_group.render_indices():
+        DEFAULT_GRAPHICS[3981 + slope_group.symmetry_item(slope_index).value] = var.symmetry_item(slope_index)
 
 for x in [1320]:
     DEFAULT_GRAPHICS[x + 1] = BuildingDiagonal.create_variants(

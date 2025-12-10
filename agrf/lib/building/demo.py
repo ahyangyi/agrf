@@ -87,7 +87,7 @@ class Demo:
         for r, row in enumerate(self.tiles):
             for c, sprite in enumerate(row[::-1]):
                 if sprite is not None:
-                    tile_slope = self.tile_slope(r, c)
+                    tile_slope = self.tile_slope(r, len(row) - 1 - c)
                     sprite = sprite.enable_foundation(tile_slope)
                     sprites.extend(
                         sprite.demo_filter(self._smart_render_contexts[r][len(row) - 1 - c])
