@@ -584,14 +584,19 @@ class ALayout:
             return self.parent_sprites
 
         sprites = [x for x in self.parent_sprites if not x.is_empty()]
+        unique_sprites = []
 
         for i in sprites:
-            for j in sprites:
+            if any(i.offset == j.offset and i.extent == j.extent for j in unique_sprites):
+                continue
+            for j in unique_sprites:
                 if i != j:
                     assert not all(
                         i.offset[k] + i.extent[k] > j.offset[k] and j.offset[k] + j.extent[k] > i.offset[k]
                         for k in range(3)
                     ), f"{i} and {j} overlap\nSprites: {sprites}"
+            unique_sprites.append(i)
+        sprites = unique_sprites
 
         ret = []
         for i in range(len(sprites)):
