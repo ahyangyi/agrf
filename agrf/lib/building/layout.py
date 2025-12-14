@@ -104,7 +104,7 @@ class DefaultGraphics:
 
 
 DEFAULT_GRAPHICS = {}
-for x in [66, 72]:
+for x in [18, 28, 39, 43, 46, 51, 60, 62, 63, 64, 65, 66, 71, 72, 73, 997]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=-8)])
 for x in [1420, 3872, 3981]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x)])
@@ -689,7 +689,11 @@ class ALayout:
         if self.foundation is not None:
             return self.add_foundation(self.foundation, slope_type).raise_tile(1)
 
-        raise NotImplementedError()
+        if slope_type == 6:
+            return self.add_default_foundation(60).raise_tile(1)
+        if slope_type == 9:
+            return self.add_default_foundation(51).raise_tile(1)
+        raise NotImplementedError(f"Unimplemented slope type {slope_type}")
 
     def to_grf(self, sprite_list):
         if self.flattened:
