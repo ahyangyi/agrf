@@ -122,6 +122,8 @@ class Demo:
                 for c, sprite in enumerate(row[::-1]):
                     if sprite is None:
                         continue
+                    tile_slope = self.tile_slope(r, len(row) - 1 - c)
+                    sprite = sprite.enable_foundation(tile_slope)
                     subimg = sprite.graphics(
                         scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
                     )

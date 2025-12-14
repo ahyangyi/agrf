@@ -121,10 +121,10 @@ DEFAULT_GRAPHICS[1034] = DEFAULT_GRAPHICS[1031].M
 
 for slope_group in slope_groups:
     var = slope_group.symmetry.create_variants(
-        [DefaultGraphics(3981 + v.value, yofs=-8 if (v.value & 2) == 2 else 0) for v in slope_group.all_variants]
+        [DefaultGraphics(3981 + v.offset, yofs=-8 if (v.value & 2) == 2 else 0) for v in slope_group.all_variants]
     )
     for slope_index in slope_group.render_indices():
-        DEFAULT_GRAPHICS[3981 + slope_group.symmetry_item(slope_index).value] = var.symmetry_item(slope_index)
+        DEFAULT_GRAPHICS[3981 + slope_group.symmetry_item(slope_index).offset] = var.symmetry_item(slope_index)
 
 for x in [1320]:
     DEFAULT_GRAPHICS[x + 1] = BuildingDiagonal.create_variants(

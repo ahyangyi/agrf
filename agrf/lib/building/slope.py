@@ -6,12 +6,12 @@ from .symmetry import BuildingSymmetricalY, BuildingDiamond, BuildingCylindrical
 @dataclass
 class SlopeType:
     value: int
+    offset: int = None
 
     def __post_init__(self):
+        self.offset = {29: 15, 23: 16, 27: 17, 30: 18}.get(self.value, self.value)
         dataclass_type_validator(self)
 
-
-slope_types = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 23, 27, 29, 30]
 
 flat = BuildingCylindrical.create_variants([SlopeType(0)])
 ortho = BuildingSymmetricalY.create_variants([SlopeType(3), SlopeType(6), SlopeType(12), SlopeType(9)])
@@ -21,6 +21,7 @@ tri = BuildingDiagonal.create_variants([SlopeType(7), SlopeType(14), SlopeType(1
 steep = BuildingDiagonal.create_variants([SlopeType(23), SlopeType(30), SlopeType(27), SlopeType(29)])
 
 slope_groups = [flat, ortho, para, mono, tri, steep]
+slope_types = [t for g in slope_groups for t in g.all_variants]
 
 
 def make_slopes(sprites, sym):
