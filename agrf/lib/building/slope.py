@@ -37,4 +37,9 @@ def make_slopes(sprites, sym):
                     ):
                         ret[i][slopeType.value] = sprites[slopeType2.value].symmetry_item(i)
                         break
+
+    for k, v in ret.items():
+        for s in v.values():
+            s.slope_variants = v
+
     return ret
