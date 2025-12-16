@@ -88,7 +88,7 @@ def make_foundation_subimage(img: LayeredImage, scale, part, style, cut_inside, 
                     alphamask *= r * 4 + c >= 0 * scale
                     alphamask *= r * 4 - c >= 0 * scale
             elif part == 4:
-                alphamask = r * 4 - c * 3 <= 128 * scale
+                alphamask = (r * 4 - c * 3 <= 128 * scale) * (r * 2 + c <= 64 * scale)
                 if not solid:
                     alphamask *= r * 2 + c >= -16 * scale
                     alphamask *= r * 4 - c * 3 >= -32 * scale
@@ -98,12 +98,12 @@ def make_foundation_subimage(img: LayeredImage, scale, part, style, cut_inside, 
                     alphamask *= r * 4 + c * 3 >= -32 * scale
                     alphamask *= r * 4 - c * 3 >= -32 * scale
             elif part == 6:
-                alphamask = r * 4 + c * 1 <= 96 * scale
+                alphamask = (r * 2 - c <= 48 * scale) * (r * 4 + c * 1 <= 96 * scale)
                 if not solid:
                     alphamask *= r * 2 + c >= -16 * scale
                     alphamask *= r * 4 - c * 3 >= -32 * scale
             elif part == 7:
-                alphamask = r * 4 + c * 3 <= 128 * scale
+                alphamask = (r * 2 - c <= 64 * scale) * (r * 4 + c * 3 <= 128 * scale)
                 if not solid:
                     alphamask *= r * 4 + c * 3 >= -32 * scale
                     alphamask *= r * 2 - c >= -16 * scale
