@@ -69,44 +69,54 @@ def make_foundation_subimage(img: LayeredImage, scale, part, style, cut_inside, 
         elif style == "extended":
             if part == 0:
                 alphamask = (r * 2 - c * 1 <= 48 * scale) * (r * 4 + c <= 96 * scale)
-                alphamask *= r * 4 + c >= 0 * scale
-                alphamask *= r * 2 - c >= 0 * scale
+                if not solid:
+                    alphamask *= r * 4 + c >= 0 * scale
+                    alphamask *= r * 2 - c >= 0 * scale
             elif part == 1:
                 alphamask = (r * 4 - c * 3 <= 128 * scale) * (r * 4 + c * 3 <= 128 * scale)
-                alphamask *= r * 4 + c >= 0 * scale
-                alphamask *= r * 4 - c >= 0 * scale
+                if not solid:
+                    alphamask *= r * 4 + c >= 0 * scale
+                    alphamask *= r * 4 - c >= 0 * scale
             elif part == 2:
                 alphamask = (r * 4 - c * 1 <= 96 * scale) * (r * 2 + c <= 48 * scale)
-                alphamask *= r * 2 + c >= 0 * scale
-                alphamask *= r * 4 - c >= 0 * scale
+                if not solid:
+                    alphamask *= r * 2 + c >= 0 * scale
+                    alphamask *= r * 4 - c >= 0 * scale
             elif part == 3:
                 alphamask = (r * 2 - c <= 48 * scale) * (r * 2 + c <= 48 * scale)
-                alphamask *= r * 4 + c >= 0 * scale
-                alphamask *= r * 4 - c >= 0 * scale
+                if not solid:
+                    alphamask *= r * 4 + c >= 0 * scale
+                    alphamask *= r * 4 - c >= 0 * scale
             elif part == 4:
                 alphamask = r * 4 - c * 3 <= 128 * scale
-                alphamask *= r * 2 + c >= -16 * scale
-                alphamask *= r * 4 - c * 3 >= -32 * scale
+                if not solid:
+                    alphamask *= r * 2 + c >= -16 * scale
+                    alphamask *= r * 4 - c * 3 >= -32 * scale
             elif part == 5:
                 alphamask = (r * 4 - c * 1 <= 96 * scale) * (r * 4 + c * 1 <= 96 * scale)
-                alphamask *= r * 4 + c * 3 >= -32 * scale
-                alphamask *= r * 4 - c * 3 >= -32 * scale
+                if not solid:
+                    alphamask *= r * 4 + c * 3 >= -32 * scale
+                    alphamask *= r * 4 - c * 3 >= -32 * scale
             elif part == 6:
                 alphamask = r * 4 + c * 1 <= 96 * scale
-                alphamask *= r * 2 + c >= -16 * scale
-                alphamask *= r * 4 - c * 3 >= -32 * scale
+                if not solid:
+                    alphamask *= r * 2 + c >= -16 * scale
+                    alphamask *= r * 4 - c * 3 >= -32 * scale
             elif part == 7:
                 alphamask = r * 4 + c * 3 <= 128 * scale
-                alphamask *= r * 4 + c * 3 >= -32 * scale
-                alphamask *= r * 2 - c >= -16 * scale
+                if not solid:
+                    alphamask *= r * 4 + c * 3 >= -32 * scale
+                    alphamask *= r * 2 - c >= -16 * scale
             elif part == 8:
                 alphamask = (r * 4 - c * 3 <= 128 * scale) * (r * 4 + c * 3 <= 128 * scale)
-                alphamask *= r * 2 + c >= -16 * scale
-                alphamask *= r * 2 - c >= -16 * scale
+                if not solid:
+                    alphamask *= r * 2 + c >= -16 * scale
+                    alphamask *= r * 2 - c >= -16 * scale
             elif part == 9:
                 alphamask = (r * 4 - c * 1 <= 96 * scale) * (r * 2 + c <= 48 * scale)
-                alphamask *= r * 4 + c * 3 >= -32 * scale
-                alphamask *= r * 2 - c >= -16 * scale
+                if not solid:
+                    alphamask *= r * 4 + c * 3 >= -32 * scale
+                    alphamask *= r * 2 - c >= -16 * scale
             else:
                 assert False, f"Unsupported part: {part}"
             alphamask *= c >= -32 * scale
