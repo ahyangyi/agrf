@@ -87,11 +87,12 @@ class Demo:
         for r, row in enumerate(self.tiles):
             for c, sprite in enumerate(row[::-1]):
                 if sprite is not None:
-                    tile_slope = self.tile_slope(r, len(row) - 1 - c)
+                    c2 = len(row) - 1 - c
+                    tile_slope = self.tile_slope(r, c2)
                     sprite = sprite.enable_foundation(tile_slope)
                     sprites.extend(
-                        sprite.demo_filter(self._smart_render_contexts[r][len(row) - 1 - c])
-                        .demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8, self.tile_altitude(r, c))
+                        sprite.demo_filter(self._smart_render_contexts[r][c2])
+                        .demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8, self.tile_altitude(r, c2))
                         .parent_sprites
                     )
         return ALayout(None, sprites, False)
@@ -122,13 +123,14 @@ class Demo:
                 for c, sprite in enumerate(row[::-1]):
                     if sprite is None:
                         continue
-                    tile_slope = self.tile_slope(r, len(row) - 1 - c)
+                    c2 = len(row) - 1 - c
+                    tile_slope = self.tile_slope(r, c2)
                     sprite = sprite.enable_foundation(tile_slope)
-                    subimg = sprite.graphics(
-                        scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][len(row) - 1 - c]
-                    )
+                    subimg = sprite.graphics(scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][c2])
                     img.blend_over(
-                        subimg.move((32 * r - 32 * c) * scale, (16 * r + 16 * c - 8 * self.tile_altitude(r, c)) * scale)
+                        subimg.move(
+                            (32 * r - 32 * c) * scale, (16 * r + 16 * c - 8 * self.tile_altitude(r, c2)) * scale
+                        )
                     )
             return img
         except Exception as e:

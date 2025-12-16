@@ -8,7 +8,8 @@ THIS_FILE = grf.PythonFile(__file__)
 
 
 class FoundationSprite(grf.Sprite):
-    def __init__(self, solid_sprite, ground_sprite, foundation_id, cut_inside, zshift):
+    def __init__(self, solid_sprite, ground_sprite, foundation_id, style, cut_inside, zshift):
+        assert style in ["simple", "extended", "ground"]
         representative = ground_sprite or solid_sprite
         super().__init__(
             representative.w,
@@ -16,7 +17,7 @@ class FoundationSprite(grf.Sprite):
             zoom=representative.zoom,
             xofs=representative.xofs,
             yofs=representative.yofs
-            + (8 * ZOOM_TO_SCALE[representative.zoom] if foundation_id == 8 else 0)
+            + (8 * ZOOM_TO_SCALE[representative.zoom] if style == "ground" else 0)
             + (zshift * ZOOM_TO_SCALE[representative.zoom]),
             bpp=representative.bpp,
             crop=representative.crop,
@@ -24,6 +25,7 @@ class FoundationSprite(grf.Sprite):
         self.solid_sprite = solid_sprite
         self.ground_sprite = ground_sprite
         self.foundation_id = foundation_id
+        self.style = style
         self.cut_inside = cut_inside
         self.zshift = zshift
 
@@ -32,6 +34,7 @@ class FoundationSprite(grf.Sprite):
             "solid_sprite": self.solid_sprite.get_fingerprint() if self.solid_sprite is not None else None,
             "ground_sprite": self.ground_sprite.get_fingerprint() if self.ground_sprite is not None else None,
             "foundation_id": self.foundation_id,
+            "style": self.style,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
         }
@@ -52,6 +55,7 @@ class FoundationSprite(grf.Sprite):
             ground,
             ZOOM_TO_SCALE[(self.solid_sprite or self.ground_sprite).zoom],
             self.foundation_id,
+            self.style,
             self.cut_inside,
             self.zshift,
         )
