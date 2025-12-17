@@ -25,7 +25,7 @@ class Foundation(CachedFunctorMixin):
         g = lambda x: f(x) if x is not None else None
         return replace(self, solid=g(self.solid), ground=g(self.ground))
 
-    def make_sprite(self, slope_type):
+    def make_sprite(self, slope_type, render_context):
         foundations = self.make_foundations()
 
         if self.extended:

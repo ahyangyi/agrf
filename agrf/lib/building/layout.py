@@ -668,8 +668,8 @@ class ALayout:
     def demo_filter(self, render_context=DEFAULT_RENDER_CONTEXT):
         return self
 
-    def add_foundation(self, foundation_obj, slope_type):
-        sp = foundation_obj.make_sprite(slope_type)
+    def add_foundation(self, foundation_obj, slope_type, render_context):
+        sp = foundation_obj.make_sprite(slope_type, render_context)
         return replace(
             self, parent_sprites=self.parent_sprites + [AParentSprite(sp, (16, 16, 0), (0, 0, -8))]
         ).pushdown(0, low=True, flatten=False)
@@ -679,7 +679,7 @@ class ALayout:
             self, parent_sprites=self.parent_sprites + [ADefaultParentSprite(foundation_id, (16, 16, 0), (0, 0, -8))]
         ).pushdown(0, low=True, flatten=False)
 
-    def enable_foundation(self, slope_type):
+    def enable_foundation(self, slope_type, render_context):
         if self.slope_variants is not None:
             return self.slope_variants[slope_type]
 
@@ -687,7 +687,7 @@ class ALayout:
             return self
 
         if self.foundation is not None:
-            return self.add_foundation(self.foundation, slope_type).raise_tile(1)
+            return self.add_foundation(self.foundation, slope_type, render_context).raise_tile(1)
 
         if slope_type == 6:
             return self.add_default_foundation(60).raise_tile(1)

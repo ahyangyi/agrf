@@ -89,7 +89,7 @@ class Demo:
                 if sprite is not None:
                     c2 = len(row) - 1 - c
                     tile_slope = self.tile_slope(r, c2)
-                    sprite = sprite.enable_foundation(tile_slope)
+                    sprite = sprite.enable_foundation(tile_slope, render_context=self._smart_render_contexts[r][c2])
                     sprites.extend(
                         sprite.demo_filter(self._smart_render_contexts[r][c2])
                         .demo_translate(c * 16 - (columns - 1) * 8, r * 16 - (rows - 1) * 8, self.tile_altitude(r, c2))
@@ -125,7 +125,7 @@ class Demo:
                         continue
                     c2 = len(row) - 1 - c
                     tile_slope = self.tile_slope(r, c2)
-                    sprite = sprite.enable_foundation(tile_slope)
+                    sprite = sprite.enable_foundation(tile_slope, render_context=self._smart_render_contexts[r][c2])
                     subimg = sprite.graphics(scale, bpp, remap=remap, render_context=self._smart_render_contexts[r][c2])
                     img.blend_over(
                         subimg.move(
