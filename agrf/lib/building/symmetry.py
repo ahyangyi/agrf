@@ -200,8 +200,7 @@ class BuildingSymmetryMixin:
         for j in range(8):
             if classobj._symmetry_descriptor[j] == classobj._symmetry_descriptor[i]:
                 return j
-        # Unreachable
-        return i
+        raise ValueError(f"Unexpected index {i}")
 
     @staticmethod
     def compose_symmetry_indices(a, b):
