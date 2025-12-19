@@ -43,7 +43,8 @@ class EmptySprite(grf.Sprite):
 
 
 class EmptyAlternativeSprites(grf.AlternativeSprites):
-    pass
+    def get_fingerprint(self):
+        return {"sprites": [s.get_fingerprint() for s in self.sprites]}
 
 
 def empty_alternatives(w, h, xofs, yofs):
