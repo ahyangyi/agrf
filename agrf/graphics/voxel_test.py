@@ -46,3 +46,36 @@ class TestLazyVoxel:
         assert rotated.voxel_getter == voxel_getter
         assert rotated.config["sprites"][0]["angle"] == 135  # 45 + 90
         assert isinstance(rotated, LazyVoxel)
+
+    def test_lazy_voxel_flip(self):
+        """Test flip method creates flipped voxel instance."""
+        voxel_getter = Mock(return_value="/path/to/test.vox")
+        config = {
+            "sprites": [{"width": 32, "height": 32, "angle": 45, "flip": False}],
+            "size": {"x": 10, "y": 10, "z": 20},
+        }
+
+        voxel = LazyVoxel(name="test_voxel", prefix="/base", voxel_getter=voxel_getter, config=config)
+
+        # Flip the voxel with suffix
+        flipped = voxel.flip("flipped")
+
+        # Verify new instance is created with flipped flag
+        assert flipped is not voxel  # Must be different instance
+        assert flipped.name == "test_voxel"
+        assert flipped.prefix == os.path.join("/base", "flipped")
+        assert flipped.voxel_getter == voxel_getter
+        assert flipped.config["sprites"][0]["flip"] is True
+        assert isinstance(flipped, LazyVoxel)
+
+        # Test flipping a sprite that already has flip=True
+        config_with_flip = {
+            "sprites": [{"width": 32, "height": 32, "angle": 45, "flip": True}],
+            "size": {"x": 10, "y": 10, "z": 20},
+        }
+        voxel_with_flip = LazyVoxel(
+            name="test_voxel", prefix="/base", voxel_getter=voxel_getter, config=config_with_flip
+        )
+
+        flipped_twice = voxel_with_flip.flip("flipped_twice")
+        assert flipped_twice.config["sprites"][0]["flip"] is False
