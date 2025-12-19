@@ -40,6 +40,7 @@ class Demo:
                         climate=rc.climate or self.climate,
                         subclimate=rc.subclimate or self.subclimate,
                         rail_type=rc.rail_type or self.rail_type,
+                        slope=self.tile_slope(i, j),
                     )
                 )
             ret.append(ret_row)

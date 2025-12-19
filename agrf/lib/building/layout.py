@@ -26,6 +26,7 @@ class RenderContext:
     climate: str = None
     subclimate: str = None
     rail_type: str = None
+    slope: int = None
 
     def dodraw(self, register):
         return True
@@ -396,7 +397,9 @@ class NewGeneralSprite(TaggedCachedFunctorMixin):
             return LayeredImage.empty()
         if self.flags.get("dodraw") == Registers.NOSNOW and render_context.subclimate == "snow":
             return LayeredImage.empty()
-        if self.flags.get("dodraw") == Registers.NOSLOPE:
+        if self.flags.get("dodraw") == Registers.NOSLOPE and (
+            render_context.slope != 0 and render_context.slope is not None
+        ):
             return LayeredImage.empty()
         if "dodraw" in self.flags and not render_context.dodraw(self.flags["dodraw"]):
             return LayeredImage.empty()
