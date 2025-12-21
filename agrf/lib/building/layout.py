@@ -743,18 +743,22 @@ class ALayout:
         return f"<ALayout:{self.ground_sprite}:{self.parent_sprites}>"
 
     def __getattr__(self, name):
-        call = lambda x: getattr(x, name) if x is not None else None
-        new_ground_sprite = call(self.ground_sprite)
-        new_sprites = [call(sprite) for sprite in self.parent_sprites]
-        return ALayout(
-            new_ground_sprite,
-            new_sprites,
-            self.traversable,
-            self.category,
-            self.notes,
-            altitude=self.altitude,
-            foundation=call(self.foundation),
-        )
+        try:
+            call = lambda x: getattr(x, name) if x is not None else None
+            new_ground_sprite = call(self.ground_sprite)
+            new_sprites = [call(sprite) for sprite in self.parent_sprites]
+            return ALayout(
+                new_ground_sprite,
+                new_sprites,
+                self.traversable,
+                self.category,
+                self.notes,
+                altitude=self.altitude,
+                foundation=call(self.foundation),
+            )
+        except AttributeError as e:
+            print(f"Caught AttributeError when attempting to access ALayout.{name}...")
+            raise e
 
     def __call__(self, *args, **kwargs):
         call = lambda x: x(*args, **kwargs) if x is not None else None

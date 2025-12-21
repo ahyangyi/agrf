@@ -1,4 +1,6 @@
+import json
 import grf
+import hashlib
 from .functor import CachedFunctorMixin
 
 
@@ -29,6 +31,13 @@ class Switch(CachedFunctorMixin, grf.Switch):
     # and not rely on everything else implementing `get_default_graphics`
     def get_default_graphics(self):
         return self.default.get_default_graphics()
+
+    def __hash__(self):
+        from agrf.global_cache.switch import switch_fingerprint
+
+        return int.from_bytes(
+            hashlib.sha384(json.dumps(switch_fingerprint(self), sort_keys=True).encode()).digest(), "big"
+        )
 
 
 class DualCallback(CachedFunctorMixin, grf.DualCallback):

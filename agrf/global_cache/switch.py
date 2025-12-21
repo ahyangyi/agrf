@@ -2,6 +2,7 @@ import json
 import hashlib
 import grf
 from agrf.magic import Switch
+from agrf.lib.building.foundation import Foundation
 
 switch_cache = {}
 
@@ -11,6 +12,8 @@ def switch_fingerprint(s):
         return s
     if isinstance(s, grf.GenericSpriteLayout):
         return {"feature": str(s.feature), "ent1": s.ent1, "ent2": s.ent2}
+    if isinstance(s, Foundation):
+        return {"feature": "foundation", "foundation": s.get_fingerprint()}
     return {
         "ranges": list(sorted([(r.low, r.high, switch_fingerprint(r.ref)) for r in s._ranges])),
         "default": switch_fingerprint(s.default),
