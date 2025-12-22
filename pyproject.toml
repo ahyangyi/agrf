@@ -25,12 +25,18 @@ test = [
     "coverage",
 ]
 
+doc = [
+    "sphinx",
+    "furo",
+    "myst_parser",
+]
+
 lint = [
     "black",
 ]
 
 dev = [
-    "agrf[test,lint]",
+    "agrf[test,lint,doc]",
 ]
 
 [tool.black]
