@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from dataclass_type_validator import dataclass_type_validator
 import grf
 import numpy as np
@@ -302,3 +302,9 @@ class LayeredImage:
 
     def __repr__(self):
         return f"<LayeredImage:{self.w}x{self.h}+{self.xofs}x{self.yofs}>"
+
+    def mark_offset(self):
+        assert self.rgb is not None
+        new_rgb = self.rgb.copy()
+        new_rgb[-self.yofs][-self.xofs] = (0, 0, 255)
+        return replace(self, rgb=new_rgb)
