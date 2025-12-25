@@ -10,9 +10,7 @@ class MapSprite(grf.Sprite):
     def __init__(self, a, f, name, xofs=0, yofs=0):
         if not isinstance(a, tuple):
             a = (a,)
-        super().__init__(
-            a[0].w, a[0].h, zoom=a[0].zoom, xofs=a[0].xofs, yofs=a[0].yofs, bpp=a[0].bpp, crop=a[0].crop
-        )
+        super().__init__(a[0].w, a[0].h, zoom=a[0].zoom, xofs=a[0].xofs, yofs=a[0].yofs, bpp=a[0].bpp, crop=a[0].crop)
         self.a = a
         self.f = f
         self._fname = name

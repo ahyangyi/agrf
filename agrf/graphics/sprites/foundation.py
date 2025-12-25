@@ -15,10 +15,8 @@ class FoundationSprite(grf.Sprite):
             representative.w,
             representative.h,
             zoom=representative.zoom,
-            xofs=representative.xofs,
-            yofs=representative.yofs
-            + (8 * ZOOM_TO_SCALE[representative.zoom] if style == "ground" else 0)
-            + (zshift * ZOOM_TO_SCALE[representative.zoom]),
+            xofs=0,
+            yofs=0,
             bpp=representative.bpp,
             crop=representative.crop,
         )
@@ -60,5 +58,12 @@ class FoundationSprite(grf.Sprite):
             self.zshift,
         )
         timer.count_composing()
+
+        self.xofs = ret.xofs
+        self.yofs = (
+            ret.yofs
+            + (8 * ZOOM_TO_SCALE[self.zoom] if self.style == "ground" else 0)
+            + (self.zshift * ZOOM_TO_SCALE[self.zoom])
+        )
 
         return ret.w, ret.h, ret.rgb, ret.alpha, ret.mask
