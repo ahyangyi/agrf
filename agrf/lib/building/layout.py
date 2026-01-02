@@ -107,9 +107,9 @@ class DefaultGraphics:
 DEFAULT_GRAPHICS = {}
 for x in [996]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=-24)])
-for x in [18, 28, 39, 41, 43, 46, 60, 62, 63, 65, 66, 71, 72, 73, 991, 992, 995, 999, 1000, 1003]:
+for x in [18, 28, 39, 41, 43, 46, 62, 63, 65, 66, 71, 72, 73, 991, 992, 995, 999, 1000, 1003]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=-8)])
-for x in [51, 64, 990, 993, 994, 997, 998, 1001, 1002]:
+for x in [51, 60, 64, 990, 993, 994, 997, 998, 1001, 1002]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=0)])
 for x in [1420, 3872, 3981]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x)])
