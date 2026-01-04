@@ -1,4 +1,4 @@
-# AGRF Documentation
+# AGRF
 
 Welcome to the AGRF documentation.
 
@@ -15,10 +15,3 @@ This documentation contains information about the AGRF project.
 ## Getting Started
 
 Documentation will be added here as the project develops.
-
-
-## Indices and tables
-
-- {ref}`genindex`
-- {ref}`modindex`
-- {ref}`search`
