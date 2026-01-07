@@ -307,4 +307,9 @@ class LayeredImage:
         assert self.rgb is not None
         new_rgb = self.rgb.copy()
         new_rgb[-self.yofs][-self.xofs] = (0, 0, 255)
-        return replace(self, rgb=new_rgb)
+        if self.alpha is not None:
+            new_alpha = self.alpha.copy()
+            new_alpha[-self.yofs][-self.xofs] = 255
+        else:
+            new_alpha = None
+        return replace(self, rgb=new_rgb, alpha=new_alpha)
