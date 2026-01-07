@@ -26,4 +26,7 @@ class BlendSprite(grf.Sprite):
         a.blend_over(b, self.b_alpha)
         timer.count_composing()
 
+        self.xofs = a.xofs
+        self.yofs = a.yofs
+
         return a.w, a.h, a.rgb, a.alpha, a.mask
