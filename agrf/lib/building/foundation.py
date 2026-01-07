@@ -16,6 +16,9 @@ class Foundation(CachedFunctorMixin):
     cut_inside: bool
     zshift: int = 0
     extended: bool = False
+    ne_clip: bool = False
+    sw_shareground: bool = False
+    se_shareground: bool = False
 
     def __post_init__(self):
         super().__init__()
@@ -91,7 +94,7 @@ class Foundation(CachedFunctorMixin):
                         g = None
 
                     if s is not None or g is not None:
-                        fs = FoundationSprite(s, g, i, style, self.cut_inside, zshift=self.zshift)
+                        fs = FoundationSprite(s, g, i, style, self.cut_inside, zshift=self.zshift, ne_clip=self.ne_clip, sw_shareground=self.sw_shareground)
                         alts.append(fs)
 
             ret.append(grf.AlternativeSprites(*alts))
@@ -116,4 +119,7 @@ class Foundation(CachedFunctorMixin):
             "ground": self.ground.get_fingerprint() if self.ground is not None else None,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
+            "extended": int(self.extended),
+            "sw_shareground": int(self.sw_shareground),
+            "se_shareground": int(self.se_shareground),
         }

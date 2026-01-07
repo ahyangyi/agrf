@@ -8,7 +8,7 @@ THIS_FILE = grf.PythonFile(__file__)
 
 
 class FoundationSprite(grf.Sprite):
-    def __init__(self, solid_sprite, ground_sprite, foundation_id, style, cut_inside, zshift):
+    def __init__(self, solid_sprite, ground_sprite, foundation_id, style, cut_inside, zshift, ne_clip, sw_shareground):
         assert style in ["simple", "extended", "ground"]
         representative = ground_sprite or solid_sprite
         super().__init__(
@@ -26,6 +26,8 @@ class FoundationSprite(grf.Sprite):
         self.style = style
         self.cut_inside = cut_inside
         self.zshift = zshift
+        self.ne_clip = ne_clip
+        self.sw_shareground = sw_shareground
 
     def get_fingerprint(self):
         return {
@@ -56,6 +58,8 @@ class FoundationSprite(grf.Sprite):
             self.style,
             self.cut_inside,
             self.zshift,
+            self.ne_clip,
+            self.sw_shareground,
         )
         timer.count_composing()
 
