@@ -66,6 +66,11 @@ class Demo:
             return 0
         return min(self.altitude[r][c] for r in [row, row + 1] for c in [column, column + 1])
 
+    def tile_max_altitude(self, row, column):
+        if self.altitude is None:
+            return 0
+        return max(self.altitude[r][c] for r in [row, row + 1] for c in [column, column + 1])
+
     def tile_slope(self, row, column):
         if self.altitude is None:
             return 0
