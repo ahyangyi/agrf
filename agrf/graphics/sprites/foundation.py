@@ -61,6 +61,6 @@ class FoundationSprite(grf.Sprite):
         timer.count_composing()
 
         self.xofs = ret.xofs
-        self.yofs = ret.yofs + self.zoffset * ZOOM_TO_SCALE[self.zoom] + self.zshift * ZOOM_TO_SCALE[self.zoom]
+        self.yofs = ret.yofs + (self.zoffset + self.zshift) * ZOOM_TO_SCALE[self.zoom]
 
         return ret.w, ret.h, ret.rgb, ret.alpha, ret.mask
