@@ -16,6 +16,7 @@ class Foundation(CachedFunctorMixin):
     cut_inside: bool
     zshift: int = 0
     extended: bool = False
+    nw_clip: bool = False
     ne_clip: bool = False
     sw_shareground: bool = False
     se_shareground: bool = False
@@ -77,10 +78,44 @@ class Foundation(CachedFunctorMixin):
             else:
                 assert False, f"Unsupported slope_type: {slope_type}"
 
+    def get_sprite_conf(self, style, i):
+        left, right = {
+            ("ground", 0): (0, 0),
+            ("simple", 0): (6, None),
+            ("simple", 1): (4, None),
+            ("simple", 2): (5, None),
+            ("simple", 3): (None, 6),
+            ("simple", 4): (None, 4),
+            ("simple", 5): (None, 5),
+            ("simple", 6): (3, None),
+            ("simple", 7): (None, 3),
+            ("extended", 0): (3, 1),
+            ("extended", 1): (2, 2),
+            ("extended", 2): (1, 3),
+            ("extended", 3): (3, 3),
+            ("extended", 4): (6, 4),
+            ("extended", 5): (5, 5),
+            ("extended", 6): (7, 5),
+            ("extended", 7): (4, 6),
+            ("extended", 8): (6, 6),
+            ("extended", 9): (5, 7),
+        }[style, i]
+        if self.nw_clip and left is not None:
+            left = left & 1
+        if self.ne_clip and right is not None:
+            right = right & 1
+        if self.sw_shareground and left is not None:
+            left = left & 4
+        if self.se_shareground and right is not None:
+            right = right & 4
+
+        return left, right
+
     def make_foundations_subset(self, subset):
         # sprite.voxel.render()  # FIXME agrf cannot correctly track dependencies here
         ret = []
         for style, i in subset:
+            l, r = self.get_sprite_conf(style, i)
             alts = []
             for scale in [1, 2, 4]:
                 for bpp in [32]:
@@ -94,7 +129,9 @@ class Foundation(CachedFunctorMixin):
                         g = None
 
                     if s is not None or g is not None:
-                        fs = FoundationSprite(s, g, i, style, self.cut_inside, zshift=self.zshift, ne_clip=self.ne_clip, sw_shareground=self.sw_shareground)
+                        fs = FoundationSprite(
+                            s, g, l, r, self.cut_inside, zshift=self.zshift, zoffset=(8 if style == "ground" else 0)
+                        )
                         alts.append(fs)
 
             ret.append(grf.AlternativeSprites(*alts))
@@ -121,6 +158,7 @@ class Foundation(CachedFunctorMixin):
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
             "extended": int(self.extended),
+            "nw_clip": int(self.nw_clip),
             "ne_clip": int(self.ne_clip),
             "sw_shareground": int(self.sw_shareground),
             "se_shareground": int(self.se_shareground),

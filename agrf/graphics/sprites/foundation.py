@@ -8,8 +8,7 @@ THIS_FILE = grf.PythonFile(__file__)
 
 
 class FoundationSprite(grf.Sprite):
-    def __init__(self, solid_sprite, ground_sprite, foundation_id, style, cut_inside, zshift, ne_clip, sw_shareground):
-        assert style in ["simple", "extended", "ground"]
+    def __init__(self, solid_sprite, ground_sprite, left_parts, right_parts, cut_inside, zshift, zoffset):
         representative = ground_sprite or solid_sprite
         super().__init__(
             representative.w,
@@ -22,23 +21,21 @@ class FoundationSprite(grf.Sprite):
         )
         self.solid_sprite = solid_sprite
         self.ground_sprite = ground_sprite
-        self.foundation_id = foundation_id
-        self.style = style
+        self.left_parts = left_parts
+        self.right_parts = right_parts
         self.cut_inside = cut_inside
         self.zshift = zshift
-        self.ne_clip = ne_clip
-        self.sw_shareground = sw_shareground
+        self.zoffset = zoffset
 
     def get_fingerprint(self):
         return {
             "solid_sprite": self.solid_sprite.get_fingerprint() if self.solid_sprite is not None else None,
             "ground_sprite": self.ground_sprite.get_fingerprint() if self.ground_sprite is not None else None,
-            "foundation_id": self.foundation_id,
-            "style": self.style,
+            "left_parts": self.left_parts or -1,
+            "right_parts": self.right_parts or -1,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
-            "ne_clip": self.ne_clip,
-            "sw_shareground": self.sw_shareground,
+            "zoffset": self.zoffset,
         }
 
     def get_resource_files(self):
@@ -56,20 +53,14 @@ class FoundationSprite(grf.Sprite):
             solid,
             ground,
             ZOOM_TO_SCALE[(self.solid_sprite or self.ground_sprite).zoom],
-            self.foundation_id,
-            self.style,
+            self.left_parts,
+            self.right_parts,
             self.cut_inside,
             self.zshift,
-            self.ne_clip,
-            self.sw_shareground,
         )
         timer.count_composing()
 
         self.xofs = ret.xofs
-        self.yofs = (
-            ret.yofs
-            + (8 * ZOOM_TO_SCALE[self.zoom] if self.style == "ground" else 0)
-            + (self.zshift * ZOOM_TO_SCALE[self.zoom])
-        )
+        self.yofs = ret.yofs + self.zoffset * ZOOM_TO_SCALE[self.zoom] + self.zshift * ZOOM_TO_SCALE[self.zoom]
 
         return ret.w, ret.h, ret.rgb, ret.alpha, ret.mask

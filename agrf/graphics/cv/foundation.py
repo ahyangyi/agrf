@@ -4,131 +4,71 @@ from .. import LayeredImage
 
 
 def make_foundation_subimage(
-    img: LayeredImage, scale, part, style, cut_inside, zshift, ne_clip, sw_shareground, solid
+    img: LayeredImage, scale, left_parts, right_parts, cut_inside, zshift, solid
 ) -> LayeredImage:
     if img.alpha is not None:
         r = np.arange(img.h)[:, np.newaxis] + img.yofs + 0.5 + zshift * scale
         c = np.arange(img.w)[np.newaxis] + img.xofs - scale + 0.5
-        if style == "ground":
-            if cut_inside:
-                raise NotImplementedError()
-            else:
-                alphamask = (
-                    (r * 2 - c <= 48 * scale)
-                    * (r * 2 + c <= 48 * scale)
-                    * (r * 2 + c >= -16 * scale)
-                    * (r * 2 - c >= -16 * scale)
-                )
-        elif style == "simple":
-            if part == 0:
-                alphamask = (r * 4 - c * 3 <= 128 * scale) * (c <= 0)
-                if cut_inside:
-                    alphamask *= r * 2 - c >= 48 * scale
-                elif not solid:
-                    alphamask *= r * 2 + c >= -16 * scale
-            elif part == 1:
-                alphamask = (r * 2 - c <= 64 * scale) * (c <= 0)
-                if cut_inside:
-                    alphamask *= r * 2 - c >= 48 * scale
-                elif not solid:
-                    alphamask *= r * 4 + c * 3 >= -32 * scale
-            elif part == 2:
-                alphamask = (r * 4 - c * 1 <= 96 * scale) * (c <= 0)
-                if cut_inside:
-                    alphamask *= r * 2 - c >= 48 * scale
-                elif not solid:
-                    alphamask *= r * 2 + c >= 0
-            elif part == 3:
-                alphamask = (r * 4 + c * 3 <= 128 * scale) * (c >= 0)
-                if cut_inside:
-                    alphamask *= r * 2 + c >= 48 * scale
-                elif not solid:
-                    alphamask *= r * 2 - c >= -16 * scale
-            elif part == 4:
-                alphamask = (r * 2 + c <= 64 * scale) * (c >= 0)
-                if cut_inside:
-                    alphamask *= r * 2 + c >= 48 * scale
-                elif not solid:
-                    alphamask *= r * 4 - c * 3 >= -32 * scale
-            elif part == 5:
-                alphamask = (r * 4 + c * 1 <= 96 * scale) * (c >= 0)
-                if cut_inside:
-                    alphamask *= r * 2 + c >= 48 * scale
-                elif not solid:
-                    alphamask *= r * 2 - c >= 0
-            elif part == 6:
-                if cut_inside:
-                    alphamask = (r * 2 + c <= -16 * scale) * (c <= 0)
+
+        alphamask = np.zeros((img.h, img.w), dtype=np.uint8)
+        ones = np.ones((img.h, img.w), dtype=np.uint8)
+        if left_parts is not None:
+            left = ones * (c >= -32 * scale) * (c <= 0 * scale)
+
+            # Top limit - not applicable to solid parts
+            if not solid:
+                if left_parts // 2 == 0:
+                    left *= r * 2 + c >= 0 * scale
+                elif left_parts // 2 == 1:
+                    left *= r * 4 + c >= 0 * scale
+                elif left_parts // 2 == 2:
+                    left *= r * 4 + c * 3 >= -32 * scale
                 else:
-                    alphamask = 0
-            elif part == 7:
-                if cut_inside:
-                    alphamask = (r * 2 - c <= -16 * scale) * (c >= 0)
-                else:
-                    alphamask = 0
+                    assert left_parts // 2 == 3
+                    left *= r * 2 + c >= -16 * scale
+
+            if left_parts % 4 == 0:
+                left *= r * 2 - c <= 64 * scale
+            elif left_parts % 4 == 1:
+                left *= r * 4 - c <= 96 * scale
+            elif left_parts % 4 == 2:
+                left *= r * 4 - c * 3 <= 128 * scale
             else:
-                assert False, f"Unsupported part: {part}"
-        elif style == "extended":
-            if part == 0:
-                alphamask = (r * 2 - c * 1 <= 48 * scale) * (r * 4 + c <= 96 * scale)
-                if not solid:
-                    alphamask *= r * 4 + c >= 0 * scale
-                    alphamask *= r * 2 - c >= 0 * scale
-            elif part == 1:
-                alphamask = (r * 4 - c * 3 <= 128 * scale) * (r * 4 + c * 3 <= 128 * scale)
-                if not solid:
-                    alphamask *= r * 4 + c >= 0 * scale
-                    alphamask *= r * 4 - c >= 0 * scale
-            elif part == 2:
-                alphamask = (r * 4 - c * 1 <= 96 * scale) * (r * 2 + c <= 48 * scale)
-                if not solid:
-                    alphamask *= r * 2 + c >= 0 * scale
-                    alphamask *= r * 4 - c >= 0 * scale
-            elif part == 3:
-                alphamask = (r * 2 - c <= 48 * scale) * (r * 2 + c <= 48 * scale)
-                if not solid:
-                    alphamask *= r * 4 + c >= 0 * scale
-                    alphamask *= r * 4 - c >= 0 * scale
-            elif part == 4:
-                if sw_shareground:
-                    alphamask = r * 2 - c * 1 <= 64 * scale
+                assert left_parts % 4 == 3
+                left *= r * 2 - c <= 48 * scale
+
+            alphamask = np.maximum(alphamask, left)
+
+        if right_parts is not None:
+            right = ones * (c >= 0 * scale) * (c <= 32 * scale)
+
+            # Top limit - not applicable to solid parts
+            if not solid:
+                if right_parts // 2 == 0:
+                    right *= r * 2 - c >= 0 * scale
+                elif right_parts // 2 == 1:
+                    right *= r * 4 - c >= 0 * scale
+                elif right_parts // 2 == 2:
+                    right *= r * 4 - c * 3 >= -32 * scale
                 else:
-                    alphamask = r * 4 - c * 3 <= 128 * scale
-                alphamask *= r * 2 + c <= 64 * scale
-                if not solid:
-                    alphamask *= r * 2 + c >= -16 * scale
-                    alphamask *= r * 4 - c * 3 >= -32 * scale
-                    if ne_clip:
-                        alphamask *= ((c <= 0) + (r * 2 - c >= 0 * scale)) > 0
-            elif part == 5:
-                alphamask = (r * 4 - c * 1 <= 96 * scale) * (r * 4 + c * 1 <= 96 * scale)
-                if not solid:
-                    alphamask *= r * 4 + c * 3 >= -32 * scale
-                    alphamask *= r * 4 - c * 3 >= -32 * scale
-            elif part == 6:
-                alphamask = (r * 2 - c <= 48 * scale) * (r * 4 + c * 1 <= 96 * scale)
-                if not solid:
-                    alphamask *= r * 2 + c >= -16 * scale
-                    alphamask *= r * 4 - c * 3 >= -32 * scale
-            elif part == 7:
-                alphamask = (r * 2 - c <= 64 * scale) * (r * 4 + c * 3 <= 128 * scale)
-                if not solid:
-                    alphamask *= r * 4 + c * 3 >= -32 * scale
-                    alphamask *= r * 2 - c >= -16 * scale
-            elif part == 8:
-                alphamask = (r * 4 - c * 3 <= 128 * scale) * (r * 4 + c * 3 <= 128 * scale)
-                if not solid:
-                    alphamask *= r * 2 + c >= -16 * scale
-                    alphamask *= r * 2 - c >= -16 * scale
-            elif part == 9:
-                alphamask = (r * 4 - c * 1 <= 96 * scale) * (r * 2 + c <= 48 * scale)
-                if not solid:
-                    alphamask *= r * 4 + c * 3 >= -32 * scale
-                    alphamask *= r * 2 - c >= -16 * scale
+                    assert right_parts // 2 == 3
+                    right *= r * 2 - c >= -16 * scale
+
+            if right_parts % 4 == 0:
+                right *= r * 2 + c <= 64 * scale
+            elif right_parts % 4 == 1:
+                right *= r * 4 + c <= 96 * scale
+            elif right_parts % 4 == 2:
+                right *= r * 4 + c * 3 <= 128 * scale
             else:
-                assert False, f"Unsupported part: {part}"
-            alphamask *= c >= -32 * scale
-            alphamask *= c <= 32 * scale
+                assert right_parts % 4 == 3
+                right *= r * 2 + c <= 48 * scale
+
+            alphamask = np.maximum(alphamask, right)
+
+        if cut_inside:
+            # FIXME
+            pass
         alpha = img.alpha * alphamask
     else:
         alpha = None
@@ -137,14 +77,12 @@ def make_foundation_subimage(
 
 
 def make_foundation(
-    solid: LayeredImage, ground: LayeredImage, scale, part, style, cut_inside, zshift, ne_clip, sw_shareground
+    solid: LayeredImage, ground: LayeredImage, scale, left_parts, right_parts, cut_inside, zshift
 ) -> LayeredImage:
     if solid is not None:
-        solid = make_foundation_subimage(solid, scale, part, style, cut_inside, zshift, ne_clip, sw_shareground, True)
+        solid = make_foundation_subimage(solid, scale, left_parts, right_parts, cut_inside, zshift, True)
     if ground is not None:
-        ground = make_foundation_subimage(
-            ground, scale, part, style, cut_inside, zshift, ne_clip, sw_shareground, False
-        )
+        ground = make_foundation_subimage(ground, scale, left_parts, right_parts, cut_inside, zshift, False)
     if solid is not None and ground is not None:
         return ground.copy().blend_over(solid)
     return solid or ground
