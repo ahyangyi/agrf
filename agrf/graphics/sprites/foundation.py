@@ -31,8 +31,8 @@ class FoundationSprite(grf.Sprite):
         return {
             "solid_sprite": self.solid_sprite.get_fingerprint() if self.solid_sprite is not None else None,
             "ground_sprite": self.ground_sprite.get_fingerprint() if self.ground_sprite is not None else None,
-            "left_parts": self.left_parts or -1,
-            "right_parts": self.right_parts or -1,
+            "left_parts": self.left_parts,
+            "right_parts": self.right_parts,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
             "zoffset": self.zoffset,
