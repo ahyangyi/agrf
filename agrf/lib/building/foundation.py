@@ -98,6 +98,7 @@ class Foundation(CachedFunctorMixin):
                         alts.append(fs)
 
             ret.append(grf.AlternativeSprites(*alts))
+
         return ret
 
     def make_foundations(self):
@@ -120,6 +121,7 @@ class Foundation(CachedFunctorMixin):
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
             "extended": int(self.extended),
+            "ne_clip": int(self.ne_clip),
             "sw_shareground": int(self.sw_shareground),
             "se_shareground": int(self.se_shareground),
         }

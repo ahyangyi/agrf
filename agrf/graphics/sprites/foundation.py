@@ -37,6 +37,8 @@ class FoundationSprite(grf.Sprite):
             "style": self.style,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
+            "ne_clip": self.ne_clip,
+            "sw_shareground": self.sw_shareground,
         }
 
     def get_resource_files(self):
