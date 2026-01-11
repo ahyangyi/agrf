@@ -7,6 +7,7 @@ from agrf.graphics import SCALE_TO_ZOOM
 from agrf.graphics.sprites.foundation import FoundationSprite
 from agrf.graphics.helpers.blend import blend_alternative_sprites
 from agrf.magic import CachedFunctorMixin
+from agrf.sprites.numbered import number_alternatives
 
 
 @dataclass
@@ -16,6 +17,11 @@ class Foundation(CachedFunctorMixin):
     cut_inside: bool
     zshift: int = 0
     extended: bool = False
+    nw_clip: bool = False
+    ne_clip: bool = False
+    sw_shareground: bool = False
+    se_shareground: bool = False
+    debug_number: int = -1
 
     def __post_init__(self):
         super().__init__()
@@ -74,10 +80,50 @@ class Foundation(CachedFunctorMixin):
             else:
                 assert False, f"Unsupported slope_type: {slope_type}"
 
+    def get_sprite_conf(self, style, i):
+        left, right = {
+            ("ground", 0): (0, 0),
+            ("simple", 0): (6, None),
+            ("simple", 1): (4, None),
+            ("simple", 2): (5, None),
+            ("simple", 3): (None, 6),
+            ("simple", 4): (None, 4),
+            ("simple", 5): (None, 5),
+            ("simple", 6): (3, None),
+            ("simple", 7): (None, 3),
+            ("extended", 0): (3, 1),
+            ("extended", 1): (2, 2),
+            ("extended", 2): (1, 3),
+            ("extended", 3): (3, 3),
+            ("extended", 4): (6, 4),
+            ("extended", 5): (5, 5),
+            ("extended", 6): (7, 5),
+            ("extended", 7): (4, 6),
+            ("extended", 8): (6, 6),
+            ("extended", 9): (5, 7),
+        }[style, i]
+
+        if left is not None:
+            left = (left & 3) + (left & 6) * 2
+            if self.nw_clip:
+                left = left & 3
+            if self.sw_shareground:
+                left = left & 12
+
+        if right is not None:
+            right = (right & 3) + (right & 6) * 2
+            if self.ne_clip:
+                right = right & 3
+            if self.se_shareground:
+                right = right & 12
+
+        return left, right
+
     def make_foundations_subset(self, subset):
         # sprite.voxel.render()  # FIXME agrf cannot correctly track dependencies here
         ret = []
         for style, i in subset:
+            l, r = self.get_sprite_conf(style, i)
             alts = []
             for scale in [1, 2, 4]:
                 for bpp in [32]:
@@ -91,10 +137,16 @@ class Foundation(CachedFunctorMixin):
                         g = None
 
                     if s is not None or g is not None:
-                        fs = FoundationSprite(s, g, i, style, self.cut_inside, zshift=self.zshift)
+                        fs = FoundationSprite(
+                            s, g, l, r, self.cut_inside, zshift=self.zshift, zoffset=(8 if style == "ground" else 0)
+                        )
                         alts.append(fs)
 
-            ret.append(grf.AlternativeSprites(*alts))
+            alt_sprite = grf.AlternativeSprites(*alts)
+            if self.debug_number != -1:
+                alt_sprite = number_alternatives(alt_sprite, self.debug_number)
+            ret.append(alt_sprite)
+
         return ret
 
     def make_foundations(self):
@@ -116,4 +168,10 @@ class Foundation(CachedFunctorMixin):
             "ground": self.ground.get_fingerprint() if self.ground is not None else None,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
+            "extended": int(self.extended),
+            "nw_clip": int(self.nw_clip),
+            "ne_clip": int(self.ne_clip),
+            "sw_shareground": int(self.sw_shareground),
+            "se_shareground": int(self.se_shareground),
+            "debug_number": self.debug_number,
         }
