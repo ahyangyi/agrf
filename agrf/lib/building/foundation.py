@@ -4,7 +4,7 @@ import hashlib
 from dataclasses import dataclass, replace
 from dataclass_type_validator import dataclass_type_validator
 from agrf.graphics import SCALE_TO_ZOOM
-from agrf.graphics.sprites.foundation import FoundationSprite
+from agrf.global_cache.foundation_sprite import make_foundation_sprite
 from agrf.graphics.helpers.blend import blend_alternative_sprites
 from agrf.magic import CachedFunctorMixin
 
@@ -129,7 +129,7 @@ class Foundation(CachedFunctorMixin):
                         g = None
 
                     if s is not None or g is not None:
-                        fs = FoundationSprite(
+                        fs = make_foundation_sprite(
                             s, g, l, r, self.cut_inside, zshift=self.zshift, zoffset=(8 if style == "ground" else 0)
                         )
                         alts.append(fs)
