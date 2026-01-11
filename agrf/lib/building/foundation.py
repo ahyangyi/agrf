@@ -82,7 +82,7 @@ class Foundation(CachedFunctorMixin):
 
     def get_sprite_conf(self, style, i):
         left, right = {
-            ("ground", 0): (0, 0),
+            ("ground", 0): (7, 7),
             ("simple", 0): (6, None),
             ("simple", 1): (4, None),
             ("simple", 2): (5, None),
