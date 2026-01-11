@@ -2,20 +2,22 @@ import grf
 import numpy as np
 from .. import LayeredImage
 
+THIS_FILE = grf.PythonFile(__file__)
+
 
 def get_left_part(left_parts, r, c, solid, scale):
     left = np.ones_like(r, dtype=np.uint8) * ((c >= -32 * scale) * (c <= 0 * scale))
 
     # Top limit - not applicable to solid parts
     if not solid:
-        if left_parts // 2 == 0:
+        if left_parts // 4 == 0:
             left *= r * 2 + c >= 0 * scale
-        elif left_parts // 2 == 1:
+        elif left_parts // 4 == 1:
             left *= r * 4 + c >= 0 * scale
-        elif left_parts // 2 == 2:
+        elif left_parts // 4 == 2:
             left *= r * 4 + c * 3 >= -32 * scale
         else:
-            assert left_parts // 2 == 3
+            assert left_parts // 4 == 3
             left *= r * 2 + c >= -16 * scale
 
     if left_parts % 4 == 0:

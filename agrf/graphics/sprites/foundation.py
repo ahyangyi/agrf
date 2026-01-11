@@ -1,5 +1,5 @@
 import grf
-from agrf.graphics.cv.foundation import make_foundation
+from agrf.graphics.cv.foundation import make_foundation, THIS_FILE as CV_FILE
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 
@@ -42,7 +42,7 @@ class FoundationSprite(grf.Sprite):
         return (
             (self.solid_sprite.get_resource_files() if self.solid_sprite is not None else ())
             + (self.ground_sprite.get_resource_files() if self.ground_sprite is not None else ())
-            + (THIS_FILE,)
+            + (THIS_FILE, CV_FILE)
         )
 
     def get_data_layers(self, context):

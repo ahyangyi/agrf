@@ -102,14 +102,20 @@ class Foundation(CachedFunctorMixin):
             ("extended", 8): (6, 6),
             ("extended", 9): (5, 7),
         }[style, i]
-        if self.nw_clip and left is not None:
-            left = left & 1
-        if self.ne_clip and right is not None:
-            right = right & 1
-        if self.sw_shareground and left is not None:
-            left = left & 4
-        if self.se_shareground and right is not None:
-            right = right & 4
+
+        if left is not None:
+            left = (left & 3) + (left & 6) * 2
+            if self.nw_clip:
+                left = left & 3
+            if self.sw_shareground:
+                left = left & 12
+
+        if right is not None:
+            right = (right & 3) + (right & 6) * 2
+            if self.ne_clip:
+                right = right & 3
+            if self.se_shareground:
+                right = right & 12
 
         return left, right
 
