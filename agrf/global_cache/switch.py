@@ -1,7 +1,8 @@
+import json
+import hashlib
 import grf
 from agrf.magic import Switch
 from agrf.lib.building.foundation import Foundation
-from .digest import digest
 
 switch_cache = {}
 
@@ -21,7 +22,7 @@ def switch_fingerprint(s):
 
 
 def switch_hash(s):
-    return digest(switch_fingerprint(s))
+    return hashlib.sha384(json.dumps(switch_fingerprint(s), sort_keys=True).encode()).hexdigest()
 
 
 def make_switch(ranges, default, code):
