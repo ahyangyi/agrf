@@ -7,6 +7,7 @@ from agrf.graphics import SCALE_TO_ZOOM
 from agrf.graphics.sprites.foundation import FoundationSprite
 from agrf.graphics.helpers.blend import blend_alternative_sprites
 from agrf.magic import CachedFunctorMixin
+from agrf.sprites.numbered import number_alternatives
 
 
 @dataclass
@@ -20,6 +21,7 @@ class Foundation(CachedFunctorMixin):
     ne_clip: bool = False
     sw_shareground: bool = False
     se_shareground: bool = False
+    debug_number: int = -1
 
     def __post_init__(self):
         super().__init__()
@@ -134,7 +136,10 @@ class Foundation(CachedFunctorMixin):
                         )
                         alts.append(fs)
 
-            ret.append(grf.AlternativeSprites(*alts))
+            alt_sprite = grf.AlternativeSprites(*alts)
+            if self.debug_number != -1:
+                alt_sprite = number_alternatives(alt_sprite, self.debug_number)
+            ret.append(alt_sprite)
 
         return ret
 
@@ -162,4 +167,5 @@ class Foundation(CachedFunctorMixin):
             "ne_clip": int(self.ne_clip),
             "sw_shareground": int(self.sw_shareground),
             "se_shareground": int(self.se_shareground),
+            "debug_number": self.debug_number,
         }
