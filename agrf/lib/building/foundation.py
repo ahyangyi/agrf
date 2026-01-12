@@ -104,6 +104,13 @@ class Foundation(CachedFunctorMixin):
             ("extended", 9): (5, 7),
         }[style, i]
 
+        if (left is not None and (left & 1)) or (right is not None and (right & 1)):
+            y_limit = 48
+        else:
+            y_limit = 64
+        if self.s_shareground:
+            y_limit += 16
+
         if left is not None:
             left = (left & 3) + (left & 6) * 2
             if self.nw_clip:
@@ -118,13 +125,13 @@ class Foundation(CachedFunctorMixin):
             if self.se_shareground:
                 right = right & 12
 
-        return left, right
+        return left, right, y_limit
 
     def make_foundations_subset(self, subset):
         # sprite.voxel.render()  # FIXME agrf cannot correctly track dependencies here
         ret = []
         for style, i in subset:
-            l, r = self.get_sprite_conf(style, i)
+            l, r, y_limit = self.get_sprite_conf(style, i)
             alts = []
             for scale in [1, 2, 4]:
                 for bpp in [32]:
@@ -143,7 +150,7 @@ class Foundation(CachedFunctorMixin):
                             g,
                             l,
                             r,
-                            self.s_shareground,
+                            y_limit,
                             self.cut_inside,
                             zshift=self.zshift,
                             zoffset=(8 if style == "ground" else 0),
