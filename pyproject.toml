@@ -22,6 +22,7 @@ license = "GPL-2.0-or-later"
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pytest-cov",
     "coverage",
 ]
 
@@ -48,6 +49,7 @@ skip_magic_trailing_comma = true
 pythonpath = [
     ".",
 ]
+addopts = "--cov=agrf --cov-report=term-missing"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

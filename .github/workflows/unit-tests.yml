@@ -30,7 +30,5 @@ jobs:
         run: pip install --upgrade setuptools
       - name: Install dependencies
         run: pip install ".[test]"
-      - name: Test agrf
-        run: coverage run -m --source=agrf pytest .
-      - name: Generate coverage report
-        run: coverage report -m
+      - name: Test agrf with coverage
+        run: pytest
