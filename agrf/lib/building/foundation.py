@@ -21,6 +21,7 @@ class Foundation(CachedFunctorMixin):
     ne_clip: bool = False
     sw_shareground: bool = False
     se_shareground: bool = False
+    s_shareground: bool = False
     debug_number: int = -1
 
     def __post_init__(self):
@@ -138,7 +139,14 @@ class Foundation(CachedFunctorMixin):
 
                     if s is not None or g is not None:
                         fs = FoundationSprite(
-                            s, g, l, r, self.cut_inside, zshift=self.zshift, zoffset=(8 if style == "ground" else 0)
+                            s,
+                            g,
+                            l,
+                            r,
+                            self.s_shareground,
+                            self.cut_inside,
+                            zshift=self.zshift,
+                            zoffset=(8 if style == "ground" else 0),
                         )
                         alts.append(fs)
 
@@ -173,5 +181,6 @@ class Foundation(CachedFunctorMixin):
             "ne_clip": int(self.ne_clip),
             "sw_shareground": int(self.sw_shareground),
             "se_shareground": int(self.se_shareground),
+            "s_shareground": int(self.s_shareground),
             "debug_number": self.debug_number,
         }
