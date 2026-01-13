@@ -8,7 +8,9 @@ THIS_FILE = grf.PythonFile(__file__)
 
 
 class FoundationSprite(grf.Sprite):
-    def __init__(self, solid_sprite, ground_sprite, left_parts, right_parts, y_limit, cut_inside, zshift, zoffset):
+    def __init__(
+        self, solid_sprite, ground_sprite, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, zoffset
+    ):
         representative = ground_sprite or solid_sprite
         super().__init__(
             representative.w,
@@ -23,6 +25,8 @@ class FoundationSprite(grf.Sprite):
         self.ground_sprite = ground_sprite
         self.left_parts = left_parts
         self.right_parts = right_parts
+        self.nw = nw
+        self.ne = ne
         self.y_limit = y_limit
         self.cut_inside = cut_inside
         self.zshift = zshift
@@ -34,6 +38,8 @@ class FoundationSprite(grf.Sprite):
             "ground_sprite": self.ground_sprite.get_fingerprint() if self.ground_sprite is not None else None,
             "left_parts": self.left_parts,
             "right_parts": self.right_parts,
+            "nw": self.nw,
+            "ne": self.ne,
             "y_limit": self.y_limit,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
@@ -57,6 +63,8 @@ class FoundationSprite(grf.Sprite):
             ZOOM_TO_SCALE[(self.solid_sprite or self.ground_sprite).zoom],
             self.left_parts,
             self.right_parts,
+            self.nw,
+            self.ne,
             self.y_limit,
             self.cut_inside,
             self.zshift,

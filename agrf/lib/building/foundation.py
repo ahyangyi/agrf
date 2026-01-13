@@ -113,15 +113,11 @@ class Foundation(CachedFunctorMixin):
 
         if left is not None:
             left = (left & 3) + (left & 6) * 2
-            if self.nw_clip:
-                left = left & 3
             if self.sw_shareground:
                 left = left & 12
 
         if right is not None:
             right = (right & 3) + (right & 6) * 2
-            if self.ne_clip:
-                right = right & 3
             if self.se_shareground:
                 right = right & 12
 
@@ -150,6 +146,8 @@ class Foundation(CachedFunctorMixin):
                             g,
                             l,
                             r,
+                            self.nw_clip,
+                            self.ne_clip,
                             y_limit,
                             self.cut_inside,
                             zshift=self.zshift,
