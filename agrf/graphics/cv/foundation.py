@@ -30,39 +30,45 @@ def get_left_part(left_parts, r, c, solid, scale):
         assert left_parts % 4 == 3
         left *= r * 2 - c <= 48 * scale
 
-    return left
+    return left.astype(np.uint8)
 
 
 def make_foundation_subimage(
     img: LayeredImage, scale, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, solid
 ) -> LayeredImage:
-    if img.alpha is not None:
-        r = np.arange(img.h)[:, np.newaxis] + img.yofs + 0.5 + zshift * scale
-        c = np.arange(img.w)[np.newaxis] + img.xofs - scale + 0.5
+    r = np.arange(img.h)[:, np.newaxis] + img.yofs + 0.5 + zshift * scale
+    c = np.arange(img.w)[np.newaxis] + img.xofs - scale + 0.5
 
-        alphamask = np.zeros((img.h, img.w), dtype=np.uint8)
-        if left_parts is not None:
-            alphamask = np.maximum(alphamask, get_left_part(left_parts, r, c, solid, scale))
+    alphamask = np.zeros((img.h, img.w), dtype=np.uint8)
+    if left_parts is not None:
+        alphamask = np.maximum(alphamask, get_left_part(left_parts, r, c, solid, scale))
 
-        if right_parts is not None:
-            alphamask = np.maximum(alphamask, get_left_part(right_parts, r, -c, solid, scale))
+    if right_parts is not None:
+        alphamask = np.maximum(alphamask, get_left_part(right_parts, r, -c, solid, scale))
 
-        if cut_inside:
-            # FIXME
-            pass
+    if cut_inside:
+        # FIXME
+        pass
 
-        if nw:
-            alphamask *= (1 - (c < 0) * (r * 2 + c <= 0 * scale) * (r * 2 - c <= 48 * scale)).astype(np.uint8)
-        if ne:
-            alphamask *= (1 - (c > 0) * (r * 2 - c <= 0 * scale) * (r * 2 + c <= 48 * scale)).astype(np.uint8)
+    if nw and not solid:
+        alphamask *= (1 - (c < 0) * (r * 2 + c <= 0 * scale) * (r * 2 - c <= 48 * scale)).astype(np.uint8)
+    if ne and not solid:
+        alphamask *= (1 - (c > 0) * (r * 2 - c <= 0 * scale) * (r * 2 + c <= 48 * scale)).astype(np.uint8)
 
-        alphamask *= (1 - (r * 2 - c > y_limit * scale) * (r * 2 + c > y_limit * scale)).astype(np.uint8)
+    alphamask *= (1 - (r * 2 - c > y_limit * scale) * (r * 2 + c > y_limit * scale)).astype(np.uint8)
 
-        alpha = img.alpha * alphamask
-    else:
+    if img.alpha is None:
+        assert False
         alpha = None
+        assert img.mask is not None
+        assert img.rgb is None
+        mask = img.mask * alphamask
+    else:
+        alpha = img.alpha * alphamask
+        assert img.rgb is not None
+        mask = img.mask
 
-    return LayeredImage(xofs=img.xofs, yofs=img.yofs, w=img.w, h=img.h, rgb=img.rgb, alpha=alpha, mask=None)
+    return LayeredImage(xofs=img.xofs, yofs=img.yofs, w=img.w, h=img.h, rgb=img.rgb, alpha=alpha, mask=mask)
 
 
 def make_foundation(

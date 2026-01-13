@@ -130,7 +130,7 @@ class Foundation(CachedFunctorMixin):
             l, r, y_limit = self.get_sprite_conf(style, i)
             alts = []
             for scale in [1, 2, 4]:
-                for bpp in [32]:
+                for bpp in [8, 32]:
                     if self.solid is not None:
                         s = self.solid.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp)
                     else:
@@ -154,6 +154,8 @@ class Foundation(CachedFunctorMixin):
                             zoffset=(8 if style == "ground" else 0),
                         )
                         alts.append(fs)
+
+            assert len(alts) > 0
 
             alt_sprite = grf.AlternativeSprites(*alts)
             if self.debug_number != -1:
