@@ -13,5 +13,6 @@ def blend_alternative_sprites(a, b):
                 continue
             fs = BlendSprite(sa, sb)
             alts.append(fs)
+    assert len(alts) > 0
 
     return grf.AlternativeSprites(*alts)
