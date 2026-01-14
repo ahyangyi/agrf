@@ -47,18 +47,23 @@ def make_foundation_subimage(
         alphamask = np.maximum(alphamask, get_left_part(right_parts, r, -c, solid, scale))
 
     if cut_inside:
-        # FIXME
-        pass
+        alphamask *= (
+            1
+            - (r * 2 + c >= -16 * scale)
+            * (r * 2 - c >= -16 * scale)
+            * (r * 2 + c < 48 * scale)
+            * (r * 2 - c < 48 * scale)
+        ).astype(np.uint8)
 
-    if nw and not solid:
-        alphamask *= (1 - (c < 0) * (r * 2 + c <= 0 * scale) * (r * 2 - c <= 48 * scale)).astype(np.uint8)
-    if ne and not solid:
-        alphamask *= (1 - (c > 0) * (r * 2 - c <= 0 * scale) * (r * 2 + c <= 48 * scale)).astype(np.uint8)
+    if not solid:
+        if nw:
+            alphamask *= (1 - (c < 0) * (r * 2 + c < 0 * scale) * (r * 2 - c < 48 * scale)).astype(np.uint8)
+        if ne:
+            alphamask *= (1 - (c > 0) * (r * 2 - c < 0 * scale) * (r * 2 + c < 48 * scale)).astype(np.uint8)
 
     alphamask *= (1 - (r * 2 - c > y_limit * scale) * (r * 2 + c > y_limit * scale)).astype(np.uint8)
 
     if img.alpha is None:
-        assert False
         alpha = None
         assert img.mask is not None
         assert img.rgb is None
