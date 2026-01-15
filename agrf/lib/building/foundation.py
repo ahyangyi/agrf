@@ -21,7 +21,6 @@ class Foundation(CachedFunctorMixin):
     ne_clip: bool = False
     sw_shareground: bool = False
     se_shareground: bool = False
-    s_shareground: bool = False
     debug_number: int = -1
 
     def __post_init__(self):
@@ -108,8 +107,6 @@ class Foundation(CachedFunctorMixin):
             y_limit = 48
         else:
             y_limit = 64
-        if self.s_shareground:
-            y_limit += 16
 
         if left is not None:
             left = [left % 2, left // 2 % 2, left // 2 % 2, left // 4]
@@ -190,6 +187,5 @@ class Foundation(CachedFunctorMixin):
             "ne_clip": int(self.ne_clip),
             "sw_shareground": int(self.sw_shareground),
             "se_shareground": int(self.se_shareground),
-            "s_shareground": int(self.s_shareground),
             "debug_number": self.debug_number,
         }
