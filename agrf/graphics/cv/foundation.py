@@ -10,25 +10,21 @@ def get_left_part(left_parts, r, c, solid, scale):
 
     # Top limit - not applicable to solid parts
     if not solid:
-        if left_parts // 4 == 0:
-            left *= r * 2 + c >= 0 * scale
-        elif left_parts // 4 == 1:
-            left *= r * 4 + c >= 0 * scale
-        elif left_parts // 4 == 2:
-            left *= r * 4 + c * 3 >= -32 * scale
+        if left_parts[2] == left_parts[3]:
+            left *= r * 2 + c >= (-16 * left_parts[3]) * scale
+        elif left_parts[2] == left_parts[3] + 1:
+            left *= r * 4 + c >= (-16 * left_parts[3]) * 2 * scale
         else:
-            assert left_parts // 4 == 3
-            left *= r * 2 + c >= -16 * scale
+            assert left_parts[2] == left_parts[3] - 1
+            left *= r * 4 + c * 3 >= (-16 * left_parts[3]) * 2 * scale
 
-    if left_parts % 4 == 0:
-        left *= r * 2 - c <= 64 * scale
-    elif left_parts % 4 == 1:
-        left *= r * 4 - c <= 96 * scale
-    elif left_parts % 4 == 2:
-        left *= r * 4 - c * 3 <= 128 * scale
+    if left_parts[0] == left_parts[1]:
+        left *= r * 2 - c <= (64 - 16 * left_parts[0]) * scale
+    elif left_parts[0] == left_parts[1] + 1:
+        left *= r * 4 - c <= (64 - 16 * left_parts[0]) * 2 * scale
     else:
-        assert left_parts % 4 == 3
-        left *= r * 2 - c <= 48 * scale
+        assert left_parts[0] == left_parts[1] - 1
+        left *= r * 4 - c * 3 <= (64 - 16 * left_parts[0]) * 2 * scale
 
     return left.astype(np.uint8)
 

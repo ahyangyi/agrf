@@ -84,12 +84,12 @@ class Foundation(CachedFunctorMixin):
     def get_sprite_conf(self, style, i):
         left, right = {
             ("ground", 0): (7, 7),
-            ("simple", 0): (6, None),
-            ("simple", 1): (4, None),
-            ("simple", 2): (5, None),
-            ("simple", 3): (None, 6),
-            ("simple", 4): (None, 4),
-            ("simple", 5): (None, 5),
+            ("simple", 0): (2, None),
+            ("simple", 1): (0, None),
+            ("simple", 2): (1, None),
+            ("simple", 3): (None, 2),
+            ("simple", 4): (None, 0),
+            ("simple", 5): (None, 1),
             ("simple", 6): (3, None),
             ("simple", 7): (None, 3),
             ("extended", 0): (3, 1),
@@ -112,14 +112,16 @@ class Foundation(CachedFunctorMixin):
             y_limit += 16
 
         if left is not None:
-            left = (left & 3) + (left & 6) * 2
+            left = [left % 2, left // 2 % 2, left // 2 % 2, left // 4]
             if self.sw_shareground:
-                left = left & 12
+                left[0] = -self.zshift // 8
+                left[1] = -self.zshift // 8
 
         if right is not None:
-            right = (right & 3) + (right & 6) * 2
+            right = [right % 2, right // 2 % 2, right // 2 % 2, right // 4]
             if self.se_shareground:
-                right = right & 12
+                right[0] = -self.zshift // 8
+                right[1] = -self.zshift // 8
 
         return left, right, y_limit
 
