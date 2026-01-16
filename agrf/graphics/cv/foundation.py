@@ -53,11 +53,11 @@ def make_foundation_subimage(
 
     if not solid:
         if nw:
-            alphamask *= (1 - (c < 0) * (r * 2 + c < 0 * scale) * (r * 2 - c < 48 * scale)).astype(np.uint8)
+            alphamask *= (1 - (c < 0) * (r * 2 + c < 0 * scale) * (r * 4 - c < 64 * scale)).astype(np.uint8)
         if ne:
-            alphamask *= (1 - (c > 0) * (r * 2 - c < 0 * scale) * (r * 2 + c < 48 * scale)).astype(np.uint8)
+            alphamask *= (1 - (c > 0) * (r * 2 - c < 0 * scale) * (r * 4 + c < 64 * scale)).astype(np.uint8)
 
-    alphamask *= (1 - (r * 2 - c > y_limit * scale) * (r * 2 + c > y_limit * scale)).astype(np.uint8)
+    alphamask *= (1 - (r * 4 - c > y_limit * 2 * scale) * (r * 4 + c > y_limit * 2 * scale)).astype(np.uint8)
 
     if img.alpha is None:
         alpha = None
