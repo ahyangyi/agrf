@@ -111,14 +111,12 @@ class Foundation(CachedFunctorMixin):
         if left is not None:
             left = [left % 2, left // 2 % 2, left // 2 % 2, left // 4]
             if self.sw_shareground:
-                left[0] = -self.zshift // 8
-                left[1] = -self.zshift // 8
+                left[0] = left[1] = min(left[0], left[1]) - 1
 
         if right is not None:
             right = [right % 2, right // 2 % 2, right // 2 % 2, right // 4]
             if self.se_shareground:
-                right[0] = -self.zshift // 8
-                right[1] = -self.zshift // 8
+                right[0] = right[1] = min(right[0], right[1]) - 1
 
         return left, right, y_limit
 
