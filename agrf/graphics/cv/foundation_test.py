@@ -16,7 +16,7 @@ def test_make_foundation_subimage_basic_left_side():
     out = make_foundation_subimage(
         base,
         scale=4,
-        left_parts=6,
+        left_parts=[0, 1, 1, 1],
         right_parts=None,
         nw=False,
         ne=False,
@@ -38,7 +38,7 @@ def test_make_foundation_passthrough_single_input():
     expected_solid = make_foundation_subimage(
         base.copy(),
         scale=4,
-        left_parts=6,
+        left_parts=[0, 1, 1, 1],
         right_parts=None,
         nw=False,
         ne=False,
@@ -48,7 +48,16 @@ def test_make_foundation_passthrough_single_input():
         solid=True,
     )
     out_solid = make_foundation(
-        base, None, scale=4, left_parts=6, right_parts=None, nw=False, ne=False, y_limit=64, cut_inside=False, zshift=0
+        base,
+        None,
+        scale=4,
+        left_parts=[0, 1, 1, 1],
+        right_parts=None,
+        nw=False,
+        ne=False,
+        y_limit=64,
+        cut_inside=False,
+        zshift=0,
     )
     assert np.array_equal(out_solid.alpha, expected_solid.alpha)
 
@@ -56,7 +65,7 @@ def test_make_foundation_passthrough_single_input():
     expected_ground = make_foundation_subimage(
         base.copy(),
         scale=4,
-        left_parts=6,
+        left_parts=[0, 1, 1, 1],
         right_parts=None,
         nw=False,
         ne=False,
@@ -66,7 +75,16 @@ def test_make_foundation_passthrough_single_input():
         solid=False,
     )
     out_ground = make_foundation(
-        None, base, scale=4, left_parts=6, right_parts=None, nw=False, ne=False, y_limit=64, cut_inside=False, zshift=0
+        None,
+        base,
+        scale=4,
+        left_parts=[0, 1, 1, 1],
+        right_parts=None,
+        nw=False,
+        ne=False,
+        y_limit=64,
+        cut_inside=False,
+        zshift=0,
     )
     assert np.array_equal(out_ground.alpha, expected_ground.alpha)
 
@@ -78,7 +96,7 @@ def test_make_foundation_subimage_zshift_reduces_coverage_for_part0():
     out0 = make_foundation_subimage(
         base,
         scale=4,
-        left_parts=6,
+        left_parts=[0, 1, 1, 1],
         right_parts=None,
         nw=False,
         ne=False,
@@ -90,7 +108,7 @@ def test_make_foundation_subimage_zshift_reduces_coverage_for_part0():
     out1 = make_foundation_subimage(
         base,
         scale=4,
-        left_parts=6,
+        left_parts=[0, 1, 1, 1],
         right_parts=None,
         nw=False,
         ne=False,
