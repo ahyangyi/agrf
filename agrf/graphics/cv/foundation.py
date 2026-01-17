@@ -9,16 +9,22 @@ def get_left_part(left_parts, r, c, solid, scale):
     left = np.ones_like(r, dtype=np.uint8) * ((c >= -32 * scale) * (c <= 0 * scale))
 
     # Top limit - not applicable to solid parts
-    if not solid:
-        if left_parts[2] == left_parts[3]:
-            left *= r * 2 + c >= (-16 * left_parts[3]) * scale
-        elif left_parts[2] == left_parts[3] + 1:
-            left *= r * 4 + c >= (-16 * left_parts[3]) * 2 * scale
-        else:
-            assert left_parts[2] == left_parts[3] - 1
-            left *= r * 4 + c * 3 >= (-16 * left_parts[3]) * 2 * scale
+    # special case for None which indicates a quarter-base in simple mode
+    if left_parts[2] is None:
+        left *= r >= 8 * scale
+    else:
+        if not solid:
+            if left_parts[2] == left_parts[3]:
+                left *= r * 2 + c >= (-16 * left_parts[3]) * scale
+            elif left_parts[2] == left_parts[3] + 1:
+                left *= r * 4 + c >= (-16 * left_parts[3]) * 2 * scale
+            else:
+                assert left_parts[2] == left_parts[3] - 1
+                left *= r * 4 + c * 3 >= (-16 * left_parts[3]) * 2 * scale
 
-    if left_parts[0] == left_parts[1]:
+    if left_parts[0] is None:
+        left *= r <= 8 * scale
+    elif left_parts[0] == left_parts[1]:
         left *= r * 2 - c <= (64 - 16 * left_parts[0]) * scale
     elif left_parts[0] == left_parts[1] + 1:
         left *= r * 4 - c <= (64 - 16 * left_parts[0]) * 2 * scale

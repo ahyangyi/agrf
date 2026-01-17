@@ -118,6 +118,18 @@ class Foundation(CachedFunctorMixin):
             if self.se_shareground:
                 right[0] = right[1] = min(right[0], right[1]) - 1
 
+        if style == "simple":
+            if i < 6:
+                if left is not None:
+                    left[2] = left[3] = None
+                if right is not None:
+                    right[2] = right[3] = None
+            else:
+                if left is not None:
+                    left[0] = left[1] = None
+                if right is not None:
+                    right[0] = right[1] = None
+
         return left, right, y_limit
 
     def make_foundations_subset(self, subset):
