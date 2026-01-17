@@ -1,5 +1,5 @@
 import grf
-from agrf.graphics.cv.foundation import make_foundation
+from agrf.graphics.cv.foundation import make_foundation, THIS_FILE as CV_FILE
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 
@@ -8,8 +8,9 @@ THIS_FILE = grf.PythonFile(__file__)
 
 
 class FoundationSprite(grf.Sprite):
-    def __init__(self, solid_sprite, ground_sprite, foundation_id, style, cut_inside, zshift):
-        assert style in ["simple", "extended", "ground"]
+    def __init__(
+        self, solid_sprite, ground_sprite, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, zoffset
+    ):
         representative = ground_sprite or solid_sprite
         super().__init__(
             representative.w,
@@ -22,26 +23,34 @@ class FoundationSprite(grf.Sprite):
         )
         self.solid_sprite = solid_sprite
         self.ground_sprite = ground_sprite
-        self.foundation_id = foundation_id
-        self.style = style
+        self.left_parts = left_parts
+        self.right_parts = right_parts
+        self.nw = nw
+        self.ne = ne
+        self.y_limit = y_limit
         self.cut_inside = cut_inside
         self.zshift = zshift
+        self.zoffset = zoffset
 
     def get_fingerprint(self):
         return {
             "solid_sprite": self.solid_sprite.get_fingerprint() if self.solid_sprite is not None else None,
             "ground_sprite": self.ground_sprite.get_fingerprint() if self.ground_sprite is not None else None,
-            "foundation_id": self.foundation_id,
-            "style": self.style,
+            "left_parts": self.left_parts,
+            "right_parts": self.right_parts,
+            "nw": self.nw,
+            "ne": self.ne,
+            "y_limit": self.y_limit,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
+            "zoffset": self.zoffset,
         }
 
     def get_resource_files(self):
         return (
             (self.solid_sprite.get_resource_files() if self.solid_sprite is not None else ())
             + (self.ground_sprite.get_resource_files() if self.ground_sprite is not None else ())
-            + (THIS_FILE,)
+            + (THIS_FILE, CV_FILE)
         )
 
     def get_data_layers(self, context):
@@ -52,18 +61,17 @@ class FoundationSprite(grf.Sprite):
             solid,
             ground,
             ZOOM_TO_SCALE[(self.solid_sprite or self.ground_sprite).zoom],
-            self.foundation_id,
-            self.style,
+            self.left_parts,
+            self.right_parts,
+            self.nw,
+            self.ne,
+            self.y_limit,
             self.cut_inside,
             self.zshift,
         )
         timer.count_composing()
 
         self.xofs = ret.xofs
-        self.yofs = (
-            ret.yofs
-            + (8 * ZOOM_TO_SCALE[self.zoom] if self.style == "ground" else 0)
-            + (self.zshift * ZOOM_TO_SCALE[self.zoom])
-        )
+        self.yofs = ret.yofs + (self.zoffset + self.zshift) * ZOOM_TO_SCALE[self.zoom]
 
         return ret.w, ret.h, ret.rgb, ret.alpha, ret.mask

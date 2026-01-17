@@ -7,6 +7,7 @@ from agrf.graphics import SCALE_TO_ZOOM
 from agrf.graphics.sprites.foundation import FoundationSprite
 from agrf.graphics.helpers.blend import blend_alternative_sprites
 from agrf.magic import CachedFunctorMixin
+from agrf.sprites.numbered import number_alternatives
 
 
 @dataclass
@@ -16,6 +17,11 @@ class Foundation(CachedFunctorMixin):
     cut_inside: bool
     zshift: int = 0
     extended: bool = False
+    nw_clip: bool = False
+    ne_clip: bool = False
+    sw_shareground: bool = False
+    se_shareground: bool = False
+    debug_number: int = -1
 
     def __post_init__(self):
         super().__init__()
@@ -74,13 +80,66 @@ class Foundation(CachedFunctorMixin):
             else:
                 assert False, f"Unsupported slope_type: {slope_type}"
 
+    def get_sprite_conf(self, style, i):
+        left, right = {
+            ("ground", 0): (7, 7),
+            ("simple", 0): (2, None),
+            ("simple", 1): (0, None),
+            ("simple", 2): (1, None),
+            ("simple", 3): (None, 2),
+            ("simple", 4): (None, 0),
+            ("simple", 5): (None, 1),
+            ("simple", 6): (3, None),
+            ("simple", 7): (None, 3),
+            ("extended", 0): (3, 1),
+            ("extended", 1): (2, 2),
+            ("extended", 2): (1, 3),
+            ("extended", 3): (3, 3),
+            ("extended", 4): (6, 4),
+            ("extended", 5): (5, 5),
+            ("extended", 6): (7, 5),
+            ("extended", 7): (4, 6),
+            ("extended", 8): (6, 6),
+            ("extended", 9): (5, 7),
+        }[style, i]
+
+        if (left is not None and (left & 1)) or (right is not None and (right & 1)):
+            y_limit = 48
+        else:
+            y_limit = 64
+
+        if left is not None:
+            left = [left % 2, left // 2 % 2, left // 2 % 2, left // 4]
+            if self.sw_shareground:
+                left[0] = left[1] = min(left[0], left[1]) - 1
+
+        if right is not None:
+            right = [right % 2, right // 2 % 2, right // 2 % 2, right // 4]
+            if self.se_shareground:
+                right[0] = right[1] = min(right[0], right[1]) - 1
+
+        if style == "simple":
+            if i < 6:
+                if left is not None:
+                    left[2] = left[3] = None
+                if right is not None:
+                    right[2] = right[3] = None
+            else:
+                if left is not None:
+                    left[0] = left[1] = None
+                if right is not None:
+                    right[0] = right[1] = None
+
+        return left, right, y_limit
+
     def make_foundations_subset(self, subset):
         # sprite.voxel.render()  # FIXME agrf cannot correctly track dependencies here
         ret = []
         for style, i in subset:
+            l, r, y_limit = self.get_sprite_conf(style, i)
             alts = []
             for scale in [1, 2, 4]:
-                for bpp in [32]:
+                for bpp in [8, 32]:
                     if self.solid is not None:
                         s = self.solid.get_sprite(zoom=SCALE_TO_ZOOM[scale], bpp=bpp)
                     else:
@@ -91,10 +150,27 @@ class Foundation(CachedFunctorMixin):
                         g = None
 
                     if s is not None or g is not None:
-                        fs = FoundationSprite(s, g, i, style, self.cut_inside, zshift=self.zshift)
+                        fs = FoundationSprite(
+                            s,
+                            g,
+                            l,
+                            r,
+                            self.nw_clip,
+                            self.ne_clip,
+                            y_limit,
+                            self.cut_inside,
+                            zshift=self.zshift,
+                            zoffset=(8 if style == "ground" else 0),
+                        )
                         alts.append(fs)
 
-            ret.append(grf.AlternativeSprites(*alts))
+            assert len(alts) > 0
+
+            alt_sprite = grf.AlternativeSprites(*alts)
+            if self.debug_number != -1:
+                alt_sprite = number_alternatives(alt_sprite, self.debug_number)
+            ret.append(alt_sprite)
+
         return ret
 
     def make_foundations(self):
@@ -116,4 +192,10 @@ class Foundation(CachedFunctorMixin):
             "ground": self.ground.get_fingerprint() if self.ground is not None else None,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
+            "extended": int(self.extended),
+            "nw_clip": int(self.nw_clip),
+            "ne_clip": int(self.ne_clip),
+            "sw_shareground": int(self.sw_shareground),
+            "se_shareground": int(self.se_shareground),
+            "debug_number": self.debug_number,
         }
