@@ -9,7 +9,7 @@ THIS_FILE = grf.PythonFile(__file__)
 
 class FoundationSprite(grf.Sprite):
     def __init__(
-        self, solid_sprite, ground_sprite, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, zoffset
+        self, solid_sprite, ground_sprite, left_parts, right_parts, nw, ne, sw, se, y_limit, cut_inside, zshift, zoffset
     ):
         representative = ground_sprite or solid_sprite
         super().__init__(
@@ -27,6 +27,8 @@ class FoundationSprite(grf.Sprite):
         self.right_parts = right_parts
         self.nw = nw
         self.ne = ne
+        self.sw = sw
+        self.se = se
         self.y_limit = y_limit
         self.cut_inside = cut_inside
         self.zshift = zshift
@@ -40,6 +42,8 @@ class FoundationSprite(grf.Sprite):
             "right_parts": self.right_parts,
             "nw": self.nw,
             "ne": self.ne,
+            "sw": self.sw,
+            "se": self.se,
             "y_limit": self.y_limit,
             "cut_inside": self.cut_inside,
             "zshift": self.zshift,
@@ -65,6 +69,8 @@ class FoundationSprite(grf.Sprite):
             self.right_parts,
             self.nw,
             self.ne,
+            self.sw,
+            self.se,
             self.y_limit,
             self.cut_inside,
             self.zshift,

@@ -19,8 +19,8 @@ class Foundation(CachedFunctorMixin):
     extended: bool = False
     nw_clip: bool = False
     ne_clip: bool = False
-    sw_shareground: bool = False
-    se_shareground: bool = False
+    sw: int = 0
+    se: int = 0
     debug_number: int = -1
 
     def __post_init__(self):
@@ -110,12 +110,12 @@ class Foundation(CachedFunctorMixin):
 
         if left is not None:
             left = [left % 2, left // 2 % 2, left // 2 % 2, left // 4]
-            if self.sw_shareground:
+            if self.sw > 0:
                 left[0] = left[1] = min(left[0], left[1]) - 1
 
         if right is not None:
             right = [right % 2, right // 2 % 2, right // 2 % 2, right // 4]
-            if self.se_shareground:
+            if self.se > 0:
                 right[0] = right[1] = min(right[0], right[1]) - 1
 
         if style == "simple":
@@ -157,6 +157,8 @@ class Foundation(CachedFunctorMixin):
                             r,
                             self.nw_clip,
                             self.ne_clip,
+                            self.sw == 2,
+                            self.se == 2,
                             y_limit,
                             self.cut_inside,
                             zshift=self.zshift,
@@ -195,7 +197,7 @@ class Foundation(CachedFunctorMixin):
             "extended": int(self.extended),
             "nw_clip": int(self.nw_clip),
             "ne_clip": int(self.ne_clip),
-            "sw_shareground": int(self.sw_shareground),
-            "se_shareground": int(self.se_shareground),
+            "sw": self.sw,
+            "se": self.se,
             "debug_number": self.debug_number,
         }

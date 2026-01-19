@@ -36,7 +36,7 @@ def get_left_part(left_parts, r, c, solid, scale):
 
 
 def make_foundation_subimage(
-    img: LayeredImage, scale, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, solid
+    img: LayeredImage, scale, left_parts, right_parts, nw, ne, sw, se, y_limit, cut_inside, zshift, solid
 ) -> LayeredImage:
     r = np.arange(img.h)[:, np.newaxis] + img.yofs + 0.5 + zshift * scale
     c = np.arange(img.w)[np.newaxis] + img.xofs - scale + 0.5
@@ -59,11 +59,19 @@ def make_foundation_subimage(
 
     if not solid:
         if nw:
-            alphamask *= (1 - (c < 0) * (r * 2 + c < 0 * scale) * (r * 4 - c < 64 * scale)).astype(np.uint8)
+            alphamask *= (1 - (c < 0) * (r * 2 + c < 0 * scale) * (r * 2 - c < 48 * scale)).astype(np.uint8)
         if ne:
-            alphamask *= (1 - (c > 0) * (r * 2 - c < 0 * scale) * (r * 4 + c < 64 * scale)).astype(np.uint8)
+            alphamask *= (1 - (c > 0) * (r * 2 - c < 0 * scale) * (r * 2 + c < 48 * scale)).astype(np.uint8)
 
-    alphamask *= (1 - (r * 4 - c > y_limit * 2 * scale) * (r * 4 + c > y_limit * 2 * scale)).astype(np.uint8)
+    if sw:
+        sw_mask = r * 4 - c > y_limit * 2 * scale
+    else:
+        sw_mask = r * 2 - c > y_limit * scale
+    if se:
+        se_mask = r * 4 + c > y_limit * 2 * scale
+    else:
+        se_mask = r * 2 + c > y_limit * scale
+    alphamask *= (1 - sw_mask * se_mask).astype(np.uint8)
 
     if img.alpha is None:
         alpha = None
@@ -79,15 +87,26 @@ def make_foundation_subimage(
 
 
 def make_foundation(
-    solid: LayeredImage, ground: LayeredImage, scale, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift
+    solid: LayeredImage,
+    ground: LayeredImage,
+    scale,
+    left_parts,
+    right_parts,
+    nw,
+    ne,
+    sw,
+    se,
+    y_limit,
+    cut_inside,
+    zshift,
 ) -> LayeredImage:
     if solid is not None:
         solid = make_foundation_subimage(
-            solid, scale, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, True
+            solid, scale, left_parts, right_parts, nw, ne, sw, se, y_limit, cut_inside, zshift, True
         )
     if ground is not None:
         ground = make_foundation_subimage(
-            ground, scale, left_parts, right_parts, nw, ne, y_limit, cut_inside, zshift, False
+            ground, scale, left_parts, right_parts, nw, ne, sw, se, y_limit, cut_inside, zshift, False
         )
     if solid is not None and ground is not None:
         return ground.copy().blend_over(solid)
