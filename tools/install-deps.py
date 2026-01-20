@@ -3,7 +3,7 @@ import os
 os.system(
     """
 export GOPATH=$PWD/agrf/gorender/
-go install github.com/ahyangyi/gorender/cmd@cdca513
+go install github.com/ahyangyi/gorender/cmd@7f2bb2b
 mv ${GOPATH}/bin/cmd ${GOPATH}/bin/gorender
 go install github.com/ahyangyi/cargopositor/cmd@f9051fa
 mv ${GOPATH}/bin/cmd ${GOPATH}/bin/positor
