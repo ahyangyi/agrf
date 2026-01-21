@@ -35,27 +35,9 @@ class Foundation(CachedFunctorMixin):
         foundations = self.make_foundations()
 
         if self.extended:
-            if slope_type == 3:
-                return foundations[0]
-            elif slope_type == 5:
-                return foundations[1]
-            elif slope_type == 6:
-                return foundations[2]
-            elif slope_type == 7:
-                return foundations[3]
-            elif slope_type == 9:
-                return foundations[4]
-            elif slope_type == 10:
-                return foundations[5]
-            elif slope_type == 11:
-                return foundations[6]
-            elif slope_type == 12:
-                return foundations[7]
-            elif slope_type == 13:
-                return foundations[8]
-            elif slope_type == 14:
-                return foundations[9]
-            assert False, f"Unsupported slope_type: {slope_type}"
+            foundation_id = {3: 0, 5: 1, 6: 2, 7: 3, 9: 4, 10: 5, 11: 6, 12: 7, 13: 8, 14: 9}[slope_type]
+
+            return foundations[foundation_id]
         else:
             if slope_type == 3:
                 return foundations[5]
