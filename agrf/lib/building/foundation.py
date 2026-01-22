@@ -21,15 +21,22 @@ class Foundation(CachedFunctorMixin):
     ne_clip: bool = False
     sw: int = 0
     se: int = 0
+    subset: str = "all"
     debug_number: int = -1
 
     def __post_init__(self):
         super().__init__()
         dataclass_type_validator(self)
+        assert self.subset in {"all", "x", "y"}
 
     def fmap(self, f):
         g = lambda x: f(x) if x is not None else None
         return replace(self, solid=g(self.solid), ground=g(self.ground))
+
+    @property
+    def M(self):
+        new_subset = {"x": "y", "y": "x", "all": "all"}[self.subset]
+        return replace(self.fmap(lambda x: x.M), subset=new_subset)
 
     def make_sprite(self, slope_type, render_context):
         foundations = self.make_foundations()
@@ -158,9 +165,21 @@ class Foundation(CachedFunctorMixin):
         return ret
 
     def make_foundations(self):
-        return self.make_foundations_subset(
+        ret = self.make_foundations_subset(
             [("extended" if self.extended else "simple", i) for i in range(10 if self.extended else 8)]
         )
+
+        if self.subset == "x":
+            idx_to_delete = [0, 7]
+        elif self.subset == "y":
+            idx_to_delete = [2, 4]
+        else:
+            idx_to_delete = []
+
+        for idx in idx_to_delete:
+            ret[idx] = ret[1]
+
+        return ret
 
     def convert_foundation_to_ground(self):
         return self.make_foundations_subset([("ground", 0)])[0]
@@ -182,4 +201,5 @@ class Foundation(CachedFunctorMixin):
             "sw": self.sw,
             "se": self.se,
             "debug_number": self.debug_number,
+            "subset": self.subset,
         }
