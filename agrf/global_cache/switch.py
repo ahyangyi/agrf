@@ -3,8 +3,7 @@ import hashlib
 import grf
 from agrf.magic import Switch
 from agrf.lib.building.foundation import Foundation
-
-switch_cache = {}
+from .pool import dedup
 
 
 def switch_fingerprint(s):
@@ -25,10 +24,9 @@ def switch_hash(s):
     return hashlib.sha384(json.dumps(switch_fingerprint(s), sort_keys=True).encode()).hexdigest()
 
 
+def switch_eq(a, b):
+    return switch_fingerprint(a) == switch_fingerprint(b)
+
+
 def make_switch(ranges, default, code):
-    ret = Switch(ranges=ranges, default=default, code=code)
-    h = switch_hash(ret)
-    if h in switch_cache:
-        return switch_cache[h]
-    switch_cache[h] = ret
-    return ret
+    return dedup(Switch(ranges=ranges, default=default, code=code), hash_fn=switch_hash, eq_fn=switch_eq)
