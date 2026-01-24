@@ -60,13 +60,13 @@ def make_foundation_subimage(
             alphamask *= (1 - (c > 0) * (r * 2 - c < 0) * (r * 2 + c < 48)).astype(np.uint8)
 
     if sw:
-        sw_mask = r * 4 - c > y_limit * 2
+        sw_mask = r * 4 + c > y_limit * 2
     else:
-        sw_mask = r * 2 - c > y_limit
+        sw_mask = r * 2 + c > y_limit
     if se:
-        se_mask = r * 4 + c > y_limit * 2
+        se_mask = r * 4 - c > y_limit * 2
     else:
-        se_mask = r * 2 + c > y_limit
+        se_mask = r * 2 - c > y_limit
     alphamask *= (1 - sw_mask * se_mask).astype(np.uint8)
 
     if img.alpha is None:
