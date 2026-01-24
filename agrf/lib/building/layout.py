@@ -11,6 +11,7 @@ from .symmetry import (
     BuildingSymmetricalX,
     BuildingSymmetricalY,
     BuildingDiagonal,
+    BuildingSymmetryMixin,
 )
 from .registers import Registers
 from .slope import slope_groups
@@ -791,6 +792,11 @@ class ALayout:
 
     def get_resource_files(self):
         return unique_tuple(f for x in [self.ground_sprite] + self.parent_sprites for f in x.get_resource_files())
+
+    def symmetry_set_purchase(self, purchase):
+        for v in self.all_variants:
+            idx = self.symmetry_index(v)
+            v.purchase = self.symmetry.symmetry_item(purchase, idx)
 
 
 class LayoutSprite(grf.Sprite):
