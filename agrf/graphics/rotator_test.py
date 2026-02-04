@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from .rotator import natural_dimens, unnatural_dimens
 
@@ -25,15 +26,15 @@ UNNATURAL_DIMENS = [
 ]
 
 
-def test_natural_dimens_matches_reference_values():
-    for angle, expected in zip(ANGLES, NATURAL_DIMENS):
-        np.testing.assert_allclose(
-            natural_dimens(angle, BBOX, DEFAULT_SCALE), expected, rtol=1e-6, atol=1e-6
-        )
+@pytest.mark.parametrize("angle,expected", zip(ANGLES, NATURAL_DIMENS))
+def test_natural_dimens_matches_reference_values(angle, expected):
+    np.testing.assert_allclose(
+        natural_dimens(angle, BBOX, DEFAULT_SCALE), expected, rtol=1e-6, atol=1e-6
+    )
 
 
-def test_unnatural_dimens_matches_reference_values():
-    for angle, expected in zip(ANGLES, UNNATURAL_DIMENS):
-        np.testing.assert_allclose(
-            unnatural_dimens(angle, BBOX, DEFAULT_SCALE), expected, rtol=1e-6, atol=1e-6
-        )
+@pytest.mark.parametrize("angle,expected", zip(ANGLES, UNNATURAL_DIMENS))
+def test_unnatural_dimens_matches_reference_values(angle, expected):
+    np.testing.assert_allclose(
+        unnatural_dimens(angle, BBOX, DEFAULT_SCALE), expected, rtol=1e-6, atol=1e-6
+    )
