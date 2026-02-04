@@ -8,6 +8,7 @@ def test_font():
     font = load_font("resources/fonts/AntaeusConsoleNumbers.otf", 12)
     img = Image.new("L", (64, 32), 0)
     draw = ImageDraw.Draw(img)
+    # Measured expectations for the bundled font at size 12.
     expected_text_width = 12
     expected_non_zero_pixels = 52
     _, _, width, _ = draw.textbbox((0, 0), "42", font=font)
