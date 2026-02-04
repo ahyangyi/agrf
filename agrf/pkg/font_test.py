@@ -8,8 +8,10 @@ def test_font():
     font = load_font("resources/fonts/AntaeusConsoleNumbers.otf", 12)
     img = Image.new("L", (64, 32), 0)
     draw = ImageDraw.Draw(img)
+    expected_width = 12
+    expected_non_zero_pixels = 52
     _, _, width, _ = draw.textbbox((0, 0), "42", font=font)
-    assert width == 12
+    assert width == expected_width
     draw.text((0, 0), "42", 255, font=font)
     non_zero_pixels = int(np.count_nonzero(np.asarray(img)))
-    assert non_zero_pixels == 52
+    assert non_zero_pixels == expected_non_zero_pixels
