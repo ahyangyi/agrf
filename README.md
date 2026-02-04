@@ -2,6 +2,7 @@ Ahyangyi's OpenTTD NewGRF Library
 =================================
 
 ![Unit tests](https://github.com/ahyangyi/agrf/actions/workflows/unit-tests.yml/badge.svg)
+![Coverage](https://codecov.io/gh/ahyangyi/agrf/branch/main/graph/badge.svg)
 
 This library depends on [grf-py](https://github.com/citymania-org/grf-py), and implements additional high-level functionalities.
 
