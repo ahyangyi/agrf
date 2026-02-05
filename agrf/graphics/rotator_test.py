@@ -28,13 +28,9 @@ UNNATURAL_DIMENS = [
 
 @pytest.mark.parametrize("angle,expected", zip(_TEST_ANGLES, NATURAL_DIMENS))
 def test_natural_dimens_matches_reference_values(angle, expected):
-    np.testing.assert_allclose(
-        natural_dimens(angle, _TEST_BBOX, _TEST_SCALE), expected, rtol=1e-6, atol=1e-6
-    )
+    np.testing.assert_allclose(natural_dimens(angle, _TEST_BBOX, _TEST_SCALE), expected, rtol=1e-6, atol=1e-6)
 
 
 @pytest.mark.parametrize("angle,expected", zip(_TEST_ANGLES, UNNATURAL_DIMENS))
 def test_unnatural_dimens_matches_reference_values(angle, expected):
-    np.testing.assert_allclose(
-        unnatural_dimens(angle, _TEST_BBOX, _TEST_SCALE), expected, rtol=1e-6, atol=1e-6
-    )
+    np.testing.assert_allclose(unnatural_dimens(angle, _TEST_BBOX, _TEST_SCALE), expected, rtol=1e-6, atol=1e-6)
