@@ -6,7 +6,6 @@ Welcome to the AGRF documentation.
 ---
 maxdepth: 2
 ---
-previews
 ```
 
 ## Overview
