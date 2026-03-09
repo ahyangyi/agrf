@@ -11,8 +11,8 @@ from agrf.lib.building.layout import ADefaultGroundSprite, ALayout
 from agrf.lib.building.demo import Demo
 
 IMG_DIR = os.path.join(os.path.dirname(__file__), "img")
-SCALE = 4  # 4x zoom (256 px per tile)
-BPP = 32  # 32-bit RGBA output
+SCALE = 4
+BPP = 32
 
 
 def make_layout(sprite_id):
@@ -38,9 +38,8 @@ def generate_empty_grounds():
         )
         save_demo(demo, f"ground_{climate}.png")
 
-    # Arctic uses rail sprite 1012 as ground because arctic/3981.png is
-    # 258×129 px instead of the expected 256×127 px, which causes array
-    # shape mismatches during rendering.
+    # Arctic uses rail sprite 1012 as ground because arctic/3981.png has a
+    # non-standard size that causes rendering issues.
     arctic_ground = make_layout(1012)
     demo = Demo(
         tiles=[[arctic_ground, arctic_ground], [arctic_ground, arctic_ground]],
