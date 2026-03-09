@@ -18,4 +18,4 @@ jobs:
       - name: Install dependencies
         run: pip install ".[dev]"
       - name: Clone Wuhu station set
-        run: git clone https://github.com/OpenTTD-China-Set/China-Set-Stations-Wuhu
+        run: git clone https://github.com/OpenTTD-China-Set/China-Set-Stations-Wuhu ../China-Set-Stations-Wuhu
