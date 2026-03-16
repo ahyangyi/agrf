@@ -23,6 +23,7 @@ class Parameter(ParameterReverseLookup):
 
     def add(self, g, s):
         g.add_int_parameter(
+            key=self.name.lower(),
             name=s[f"STR_PARAM_{self.name}"],
             description=s[f"STR_PARAM_{self.name}_DESC"],
             default=self.default,
