@@ -17,8 +17,11 @@ jobs:
         uses: astral-sh/setup-uv@v4
       - name: Set up Python 3.12.10
         run: uv python install 3.12.10
-      - name: Create virtual environment
-        run: uv venv --python 3.12.10
+      - name: Create and activate virtual environment
+        run: |
+          uv venv --python 3.12.10
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
       - name: Install dependencies
         run: uv pip install .
       - name: Build
