@@ -1,6 +1,7 @@
 .PHONY: doc clean test
 
 doc:
+	python tools/docgen.py
 	cd docs && $(MAKE) html
 
 clean:
