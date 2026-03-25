@@ -45,8 +45,13 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-docs/_static/generated/
-docs/generated/
+docs/_static/
+docs/img/
+docs/*.md
+!docs/index.md
+!docs/manifest_json.md
+!docs/readme.md
+!docs/changelog.md
 
 # Virtual environments
 .env

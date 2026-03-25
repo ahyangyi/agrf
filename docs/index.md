@@ -3,9 +3,10 @@
 Welcome to the AGRF documentation.
 
 ```{toctree}
----
-maxdepth: 2
----
+:maxdepth: 2
+:hidden:
+
+baseset_sprites
 ```
 
 ## Overview

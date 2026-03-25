@@ -16,7 +16,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "furo"
-html_static_path = ["_static"]
+html_static_path = ["_static", "img"]
 
 # Theme options for Furo
 html_theme_options = {
