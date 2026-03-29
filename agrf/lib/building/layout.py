@@ -11,6 +11,7 @@ from .symmetry import (
     BuildingSymmetricalX,
     BuildingSymmetricalY,
     BuildingDiagonal,
+    BuildingRotational,
     BuildingSymmetryMixin,
 )
 from .registers import Registers
@@ -160,6 +161,15 @@ for x in [1320]:
     DEFAULT_GRAPHICS[x] = DEFAULT_GRAPHICS[x + 1].R
     DEFAULT_GRAPHICS[x + 2] = DEFAULT_GRAPHICS[x + 1].T
     DEFAULT_GRAPHICS[x + 3] = DEFAULT_GRAPHICS[x + 1].T.R
+
+# Bus stop ground sprites (2692-2695) - NE, SE, SW, NW orientations (rotational)
+_bus_stop_rotational = BuildingRotational.create_variants(
+    [DefaultGraphics(2692), DefaultGraphics(2693), DefaultGraphics(2694), DefaultGraphics(2695)]
+)
+DEFAULT_GRAPHICS[2692] = _bus_stop_rotational
+DEFAULT_GRAPHICS[2693] = _bus_stop_rotational.M
+DEFAULT_GRAPHICS[2694] = _bus_stop_rotational.R
+DEFAULT_GRAPHICS[2695] = _bus_stop_rotational.M.R
 
 
 @dataclass
