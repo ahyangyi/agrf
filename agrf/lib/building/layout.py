@@ -134,7 +134,7 @@ for x in [
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=-8)])
 for x in [5464, 5473, 5477, 990, 993, 994, 997, 998, 1001, 1002]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x, yofs=0)])
-for x in [1420, 3872, 3981]:
+for x in [1315, 1334, 1420, 3872, 3981]:
     DEFAULT_GRAPHICS[x] = BuildingCylindrical.create_variants([DefaultGraphics(x)])
 for x in [1011, 1093, 1175, 1313, 1332]:
     DEFAULT_GRAPHICS[x] = BuildingSymmetrical.create_variants([DefaultGraphics(x), DefaultGraphics(x + 1)])
@@ -162,14 +162,13 @@ for x in [1320]:
     DEFAULT_GRAPHICS[x + 2] = DEFAULT_GRAPHICS[x + 1].T
     DEFAULT_GRAPHICS[x + 3] = DEFAULT_GRAPHICS[x + 1].T.R
 
-# Bus stop ground sprites (2692-2695) - NE, SE, SW, NW orientations (rotational)
-_bus_stop_rotational = BuildingRotational.create_variants(
-    [DefaultGraphics(2692), DefaultGraphics(2693), DefaultGraphics(2694), DefaultGraphics(2695)]
-)
-DEFAULT_GRAPHICS[2692] = _bus_stop_rotational
-DEFAULT_GRAPHICS[2693] = _bus_stop_rotational.M
-DEFAULT_GRAPHICS[2694] = _bus_stop_rotational.R
-DEFAULT_GRAPHICS[2695] = _bus_stop_rotational.M.R
+for x in [1316, 1335, 2691]:
+    DEFAULT_GRAPHICS[x] = BuildingRotational.create_variants(
+        [DefaultGraphics(x), DefaultGraphics(x + 1), DefaultGraphics(x + 2), DefaultGraphics(x + 3)]
+    )
+    DEFAULT_GRAPHICS[x + 1] = DEFAULT_GRAPHICS[x].M
+    DEFAULT_GRAPHICS[x + 2] = DEFAULT_GRAPHICS[x].R
+    DEFAULT_GRAPHICS[x + 3] = DEFAULT_GRAPHICS[x].M.R
 
 
 @dataclass
