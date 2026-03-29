@@ -162,7 +162,7 @@ for x in [1320]:
     DEFAULT_GRAPHICS[x + 2] = DEFAULT_GRAPHICS[x + 1].T
     DEFAULT_GRAPHICS[x + 3] = DEFAULT_GRAPHICS[x + 1].T.R
 
-for x in [1316, 1335, 2691]:
+for x in [1316, 1335, 2692]:
     DEFAULT_GRAPHICS[x] = BuildingRotational.create_variants(
         [DefaultGraphics(x), DefaultGraphics(x + 1), DefaultGraphics(x + 2), DefaultGraphics(x + 3)]
     )
