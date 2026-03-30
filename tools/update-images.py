@@ -93,8 +93,19 @@ def extract_tar(tar_path: Path, dest_dir: Path) -> None:
     print("✓ Extraction complete.")
 
 
+SCRIPT_PATH = Path(__file__).resolve()
+SUCCESS_MARKER = CACHE_DIR / ".extraction-success"
+
+
 def extract_all_sprites() -> None:
     """Extract 4x sprites from all GRF files to OUTPUT_DIR."""
+    if SUCCESS_MARKER.exists():
+        script_mtime = SCRIPT_PATH.stat().st_mtime
+        marker_mtime = SUCCESS_MARKER.stat().st_mtime
+        if marker_mtime > script_mtime:
+            print(f"\nSkipping sprite extraction (up to date).")
+            return
+
     print(f"\nExtracting sprites to {OUTPUT_DIR}...")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     clear_directory(OUTPUT_DIR)
@@ -109,7 +120,59 @@ def extract_all_sprites() -> None:
         print(f"  Extracting {grf_name}...")
         extract_from_grf(grf_path, grf_output_dir)
 
+    SUCCESS_MARKER.touch()
     print("✓ Sprite extraction complete.")
+
+
+CLIMATE_PATTERN_MAP = {0: "temperate", 1: "arctic", 2: "tropical", 3: "toyland"}
+CLIMATE_GROUND_PATTERN_MAP = {5: "temperate", 6: "arctic", 7: "tropical", 8: "toyland"}
+THIRD_PARTY_DIR = Path(__file__).parent.parent / "agrf" / "third_party" / "opengfx2"
+
+
+def copy_extra_sprites():
+    """Copy sprites from ogfx2e_extra_32ez to third_party/opengfx2."""
+    print(f"\nCopying extra sprites to {THIRD_PARTY_DIR}...")
+
+    extra_dir = OUTPUT_DIR / "ogfx2e_extra_32ez"
+    if not extra_dir.exists():
+        print(f"  Warning: {extra_dir} not found, skipping copy.")
+        return
+
+    THIRD_PARTY_DIR.mkdir(parents=True, exist_ok=True)
+
+    copied = 0
+    skipped = 0
+
+    # climate pattern
+    for x_range in [range(990, 1004), range(5413, 5503)]:
+        for x in x_range:
+            for y, climate in CLIMATE_PATTERN_MAP.items():
+                src = extra_dir / f"{x}_{y}.png"
+                climate_dir = THIRD_PARTY_DIR / climate
+                climate_dir.mkdir(parents=True, exist_ok=True)
+                dst = climate_dir / f"{x}.png"
+
+                if src.exists():
+                    shutil.copy2(src, dst)
+                    copied += 1
+                else:
+                    skipped += 1
+
+    # climate ground pattern
+    for a in range(1011, 1227):
+        for b, climate in CLIMATE_GROUND_PATTERN_MAP.items():
+            src = extra_dir / f"{a}_{b}.png"
+            climate_dir = THIRD_PARTY_DIR / climate
+            climate_dir.mkdir(parents=True, exist_ok=True)
+            dst = climate_dir / f"{a}.png"
+
+            if src.exists():
+                shutil.copy2(src, dst)
+                copied += 1
+            else:
+                skipped += 1
+
+    print(f"✓ Copied {copied} sprites, skipped {skipped}.")
 
 
 def main():
@@ -154,6 +217,7 @@ def main():
 
     extract_tar(tar_path, BASESET_DIR)
     extract_all_sprites()
+    copy_extra_sprites()
 
     return 0
 
