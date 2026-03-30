@@ -76,3 +76,8 @@ Thumbs.db
 # Project specific
 /agrf/gorender/bin
 /agrf/gorender/pkg
+
+# Generated assets
+tools/.baseset/
+tools/.output/
+tools/.cache/
