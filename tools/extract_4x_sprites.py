@@ -39,6 +39,9 @@ from grf.decompile import RealGraphicsSprite, decode_sprite, read, ParsingContex
 from grf.colour import PIL_PALETTE
 from agrf.graphics.layered_image import LayeredImage
 
+SCRIPT_PATH = Path(__file__).resolve()
+SUCCESS_MARKER = ".extraction-success"
+
 
 # Action 5 base sprite IDs from OpenTTD src/newgrf/newgrf_act5.cpp
 ACTION5_BASE_SPRITES = {
@@ -137,6 +140,12 @@ def extract_from_grf(
     with_bit_width: bool = False,
 ):
     """Extract 4x zoom sprites from a single GRF file."""
+    marker_file = output_dir / SUCCESS_MARKER
+    if marker_file.exists():
+        script_mtime = SCRIPT_PATH.stat().st_mtime
+        marker_mtime = marker_file.stat().st_mtime
+        if marker_mtime > script_mtime:
+            return
 
     print(f"Reading GRF: {grf_path}")
 
@@ -491,6 +500,8 @@ def extract_from_grf(
         print(f"  Palette sprites: {extracted_pal}")
         print(f"  Blended sprites: {extracted_blended}")
         print(f"  Skipped: {skipped}")
+
+        marker_file.touch()
 
 
 def main():

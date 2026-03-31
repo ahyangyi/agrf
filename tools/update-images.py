@@ -93,19 +93,8 @@ def extract_tar(tar_path: Path, dest_dir: Path) -> None:
     print("✓ Extraction complete.")
 
 
-SCRIPT_PATH = Path(__file__).resolve()
-SUCCESS_MARKER = CACHE_DIR / ".extraction-success"
-
-
 def extract_all_sprites() -> None:
     """Extract 4x sprites from all GRF files to OUTPUT_DIR."""
-    if SUCCESS_MARKER.exists():
-        script_mtime = SCRIPT_PATH.stat().st_mtime
-        marker_mtime = SUCCESS_MARKER.stat().st_mtime
-        if marker_mtime > script_mtime:
-            print(f"\nSkipping sprite extraction (up to date).")
-            return
-
     print(f"\nExtracting sprites to {OUTPUT_DIR}...")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     clear_directory(OUTPUT_DIR)
@@ -120,7 +109,6 @@ def extract_all_sprites() -> None:
         print(f"  Extracting {grf_name}...")
         extract_from_grf(grf_path, grf_output_dir)
 
-    SUCCESS_MARKER.touch()
     print("✓ Sprite extraction complete.")
 
 
@@ -159,7 +147,7 @@ def copy_extra_sprites():
                     skipped += 1
 
     # climate ground pattern
-    for a in range(1011, 1227):
+    for a in list(range(1011, 1227)) + list(range(1332, 1351)) + list(range(1370, 1398)):
         for b, climate in CLIMATE_GROUND_PATTERN_MAP.items():
             src = extra_dir / f"{a}_{b}.png"
             climate_dir = THIRD_PARTY_DIR / climate
