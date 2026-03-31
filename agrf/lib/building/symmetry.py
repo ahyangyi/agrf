@@ -17,6 +17,14 @@ class BuildingSymmetryMixin:
             v.symmetry = classobj
         return variants[0]
 
+    # This is a weird method
+    #   Use this when item already have properties `item.R` `item.M` `item.T`, but calling these creates a new object
+    #   memoize() then uses these to create as many new objects as the symmetry needs
+    #   and links them so that future calls to these properties always returns the memoized ones
+    @classmethod
+    def memoize(cls, item):
+        return cls.create_variants(cls.get_all_variants(item))
+
     @property
     def M(self):
         return self._M
