@@ -43,3 +43,7 @@ def remove_control_letters(s):
             ret.append(s[i])
             i += 1
     return "".join(ret)
+
+
+def label_printable(x):
+    return "".join(chr(b) if 0x20 <= b <= 0x7F else hex(b)[2:].upper() for b in x)
