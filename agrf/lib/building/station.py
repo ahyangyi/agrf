@@ -1,6 +1,6 @@
 import grf
 from agrf.actions import FakeReferencingAction, FakeReferencedAction
-from agrf.lib.building.registers import code, default_code
+from agrf.lib.building.registers import code
 from agrf.lib.building.station_tile_switch import StationTileSwitch
 from agrf.strings import label_printable
 from agrf.utils import unique
@@ -112,16 +112,14 @@ class AStation(grf.SpriteGenerator):
             self.callbacks.graphics = grf.GraphicsCallback(
                 default=grf.Switch(
                     ranges={2: foundations},
-                    code=code + self.extra_code + default_code + "\nextra_callback_info1_byte",
+                    code=code + self.extra_code + "\nextra_callback_info1_byte",
                     default=graphics,
                 ),
                 purchase=grf.Switch(ranges={0: graphics}, code=code + self.extra_code, default=graphics),
             )
             props["general_flags"] = props.get("general_flags", 0) | 0b1000
         else:
-            self.callbacks.graphics = grf.Switch(
-                ranges={0: graphics}, code=code + self.extra_code + default_code, default=graphics
-            )
+            self.callbacks.graphics = grf.Switch(ranges={0: graphics}, code=code + self.extra_code, default=graphics)
 
         cb_props = {}
         self.callbacks.set_flag_props(cb_props)
