@@ -1,0 +1,61 @@
+{
+  "name": "Custom Simplified Chinese to OpenTTD-flavored Traditional Chinese",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "group",
+      "dicts": [
+        {
+          "type": "text",
+          "file": "s2t.txt"
+        },
+        {
+          "type": "ocd2",
+          "file": "STPhrases.ocd2"
+        }
+      ]
+    }
+  },
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          {
+            "type": "text",
+            "file": "s2t.txt"
+          },
+          {
+            "type": "ocd2",
+            "file": "STPhrases.ocd2"
+          },
+          {
+            "type": "ocd2",
+            "file": "STCharacters.ocd2"
+          }
+        ]
+      }
+    },
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          {
+            "type": "text",
+            "file": "tw.txt"
+          },
+          {
+            "type": "ocd2",
+            "file": "TWPhrases.ocd2"
+          }
+        ]
+      }
+    },
+    {
+      "dict": {
+        "type": "ocd2",
+        "file": "TWVariants.ocd2"
+      }
+    }
+  ]
+}
