@@ -58,6 +58,7 @@ class ARoadStop(grf.SpriteGenerator):
             default=graphics,
             code="""
 TEMP[0x03] = (terrain_type & 0x4) == 0x4
+TEMP[0x07] = (19 * ((terrain_type & 0x5) > 0))
 """,
         )
         self.callbacks.set_flag_props(self._props)

@@ -9,6 +9,7 @@ class Registers:
     NOSNOW = grf.Temp(4)
     RECOLOUR_OFFSET = grf.Temp(5)
     NOSLOPE = grf.Temp(6)
+    CLIMATE_ROAD_OFFSET = grf.Temp(7)
 
 
 code = """
@@ -18,4 +19,5 @@ TEMP[0x02] = 569 * ((terrain_type & 0x5) > 0)
 TEMP[0x03] = (terrain_type & 0x4) == 0x4
 TEMP[0x04] = (terrain_type & 0x4) != 0x4
 TEMP[0x06] = var(0x67, param=0x00, shift=0, and=0x0000001f) == 0
+TEMP[0x07] = (19 * ((terrain_type & 0x5) > 0))
 """
