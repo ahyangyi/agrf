@@ -2,7 +2,6 @@ import grf
 from agrf.graphics import LayeredImage
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 
-
 THIS_FILE = grf.PythonFile(__file__)
 
 

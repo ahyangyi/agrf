@@ -5,7 +5,6 @@ from agrf.graphics import LayeredImage
 from agrf.utils import unique_tuple
 from agrf.lib.building.layout import ALayout, RenderContext
 
-
 DEFAULT_RENDER_CONTEXT = RenderContext()
 
 

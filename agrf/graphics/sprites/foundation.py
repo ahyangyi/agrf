@@ -3,7 +3,6 @@ from agrf.graphics.cv.foundation import make_foundation, THIS_FILE as CV_FILE
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 
-
 THIS_FILE = grf.PythonFile(__file__)
 
 

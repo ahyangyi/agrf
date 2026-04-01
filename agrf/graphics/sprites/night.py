@@ -3,7 +3,6 @@ from agrf.graphics.cv.nightmask import make_night_mask
 from agrf.graphics import LayeredImage, SCALE_TO_ZOOM, ZOOM_TO_SCALE
 from agrf.graphics.spritesheet import LazyAlternativeSprites
 
-
 THIS_FILE = grf.PythonFile(__file__)
 
 
