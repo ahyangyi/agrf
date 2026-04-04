@@ -21,8 +21,6 @@ class AStation(grf.SpriteGenerator):
         make_foundation=False,
         foundation_object=None,
         extra_code="",
-        action2_pool=None,
-        station_tile_switch_class=None,
         **props,
     ):
         super().__init__()
@@ -38,8 +36,6 @@ class AStation(grf.SpriteGenerator):
         self.make_foundation = make_foundation
         self.foundation_object = foundation_object
         self.extra_code = extra_code
-        self.action2_pool = action2_pool
-        self._station_tile_switch_class = station_tile_switch_class
         self._props = {
             **props,
             "non_traversable_tiles": non_traversable_tiles,
@@ -51,15 +47,12 @@ class AStation(grf.SpriteGenerator):
     def class_label_plain(self):
         return label_printable(self._props["class_label"])
 
-    def _is_station_tile_switch(self, obj):
-        return self._station_tile_switch_class is not None and isinstance(obj, self._station_tile_switch_class)
-
     def _map_foundation(self, obj):
-        if self._is_station_tile_switch(obj):
+        if isinstance(obj, StationTileSwitch):
             return obj.to_index(None)
         return obj
 
-    def get_sprites(self, g, sprites=None):
+    def get_sprites(self, g, sprites=None, action2_pool=None):
         is_managed_by_metastation = sprites is not None
         if isinstance(self.translation_name, str):
             translated_name = g.strings[f"STR_STATION_{self.translation_name}"]
@@ -76,8 +69,8 @@ class AStation(grf.SpriteGenerator):
 
         res = []
 
-        if self.action2_pool is not None:
-            graphics = self.action2_pool.get_action_2_zero()
+        if action2_pool is not None:
+            graphics = action2_pool.get_action_2_zero()
         else:
             graphics = grf.GenericSpriteLayout(ent1=[0], ent2=[0], feature=grf.STATION)
 
@@ -85,11 +78,11 @@ class AStation(grf.SpriteGenerator):
 
         use_foundation = self.make_foundation or self.foundation_object is not None
 
-        if use_foundation and self.action2_pool is not None:
+        if use_foundation:
             if self.make_foundation:
                 cb14 = self.callbacks.select_sprite_layout.default
                 self.callbacks.select_sprite_layout.default = cb14.to_index(self.layouts)
-                foundations = self.action2_pool.map_switch(cb14)
+                foundations = action2_pool.map_switch(cb14)
                 foundations = self._map_foundation(foundations)
             else:  # foundation_object
                 if self.foundation_object is self.foundation_object.M:
@@ -97,9 +90,7 @@ class AStation(grf.SpriteGenerator):
                 else:
                     foundation_object_list = [self.foundation_object, self.foundation_object.M]
 
-                foundation_list = [
-                    self.action2_pool.map_foundation_switch(x.to_switch()) for x in foundation_object_list
-                ]
+                foundation_list = [action2_pool.map_foundation_switch(x.to_switch()) for x in foundation_object_list]
                 foundation_list = [self._map_foundation(x) for x in foundation_list]
 
                 if len(foundation_list) == 1:
